@@ -612,8 +612,8 @@ tc.CornerRadius = UDim.new(0,6)
 tc.Parent = TelaTools
 
 local TituloTools = Instance.new("TextLabel")
-TituloTools.Size = UDim2.new(1,-150,0,32)
-TituloTools.Position = UDim2.fromOffset(12,10)
+TituloTools.Size = UDim2.new(1,-24,0,28)
+TituloTools.Position = UDim2.fromOffset(12,8)
 TituloTools.BackgroundTransparency = 1
 TituloTools.Text = "TOOLS DO SERVIDOR"
 TituloTools.TextColor3 = Color3.fromRGB(235,235,235)
@@ -623,20 +623,64 @@ TituloTools.TextXAlignment = Enum.TextXAlignment.Left
 TituloTools.Parent = TelaTools
 
 local InfoTools = Instance.new("TextLabel")
-InfoTools.Size = UDim2.new(1,-24,0,25)
-InfoTools.Position = UDim2.fromOffset(12,42)
+InfoTools.Size = UDim2.new(1,-24,0,20)
+InfoTools.Position = UDim2.fromOffset(12,104)
 InfoTools.BackgroundTransparency = 1
-InfoTools.Text = "Procurando Tools em todo o conteúdo replicado para o cliente"
+InfoTools.Text = "Digite o nome da Tool para filtrar a lista"
 InfoTools.TextColor3 = Color3.fromRGB(145,145,145)
 InfoTools.Font = Enum.Font.Gotham
 InfoTools.TextSize = 10
 InfoTools.TextXAlignment = Enum.TextXAlignment.Left
 InfoTools.Parent = TelaTools
 
+--========================================================
+-- BUSCA MANUAL DE TOOL
+--========================================================
+
+local CaixaBuscaTool = Instance.new("TextBox")
+CaixaBuscaTool.Name = "BuscaTool"
+CaixaBuscaTool.Size = UDim2.new(1,-24,0,34)
+CaixaBuscaTool.Position = UDim2.fromOffset(12,38)
+CaixaBuscaTool.BackgroundColor3 = Color3.fromRGB(42,42,42)
+CaixaBuscaTool.BorderSizePixel = 0
+CaixaBuscaTool.PlaceholderText = "Pesquisar Tool..."
+CaixaBuscaTool.Text = "ArmaPdsecreta"
+CaixaBuscaTool.ClearTextOnFocus = false
+CaixaBuscaTool.TextColor3 = Color3.fromRGB(235,235,235)
+CaixaBuscaTool.PlaceholderColor3 = Color3.fromRGB(120,120,120)
+CaixaBuscaTool.Font = Enum.Font.Gotham
+CaixaBuscaTool.TextSize = 11
+CaixaBuscaTool.TextXAlignment = Enum.TextXAlignment.Left
+CaixaBuscaTool.Parent = TelaTools
+
+local buscaCorner = Instance.new("UICorner")
+buscaCorner.CornerRadius = UDim.new(0,5)
+buscaCorner.Parent = CaixaBuscaTool
+
+local PaddingBusca = Instance.new("UIPadding")
+PaddingBusca.PaddingLeft = UDim.new(0,10)
+PaddingBusca.PaddingRight = UDim.new(0,10)
+PaddingBusca.Parent = CaixaBuscaTool
+
+local BuscarTool = Instance.new("TextButton")
+BuscarTool.Size = UDim2.fromOffset(120,30)
+BuscarTool.Position = UDim2.new(1,-132,0,76)
+BuscarTool.BackgroundColor3 = Color3.fromRGB(150,0,0)
+BuscarTool.BorderSizePixel = 0
+BuscarTool.Text = "PROCURAR"
+BuscarTool.TextColor3 = Color3.fromRGB(255,255,255)
+BuscarTool.Font = Enum.Font.GothamBold
+BuscarTool.TextSize = 11
+BuscarTool.Parent = TelaTools
+
+local buscarCorner = Instance.new("UICorner")
+buscarCorner.CornerRadius = UDim.new(0,5)
+buscarCorner.Parent = BuscarTool
+
 local ListaTools = Instance.new("ScrollingFrame")
 ListaTools.Name = "ListaTools"
-ListaTools.Size = UDim2.new(1,-24,1,-86)
-ListaTools.Position = UDim2.fromOffset(12,78)
+ListaTools.Size = UDim2.new(1,-24,1,-160)
+ListaTools.Position = UDim2.fromOffset(12,128)
 ListaTools.BackgroundColor3 = Color3.fromRGB(24,24,24)
 ListaTools.BorderSizePixel = 0
 ListaTools.ScrollBarThickness = 5
@@ -652,7 +696,7 @@ ltc.Parent = ListaTools
 local ListaLayout = Instance.new("UIListLayout")
 ListaLayout.Padding = UDim.new(0,6)
 ListaLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-ListaLayout.SortOrder = Enum.SortOrder.Name
+ListaLayout.SortOrder = Enum.SortOrder.LayoutOrder
 ListaLayout.Parent = ListaTools
 
 local ListaPadding = Instance.new("UIPadding")
@@ -664,10 +708,10 @@ ListaPadding.Parent = ListaTools
 
 local AtualizarTools = Instance.new("TextButton")
 AtualizarTools.Size = UDim2.fromOffset(120,30)
-AtualizarTools.Position = UDim2.new(1,-132,0,10)
+AtualizarTools.Position = UDim2.new(1,-132,0,76)
 AtualizarTools.BackgroundColor3 = Color3.fromRGB(42,42,42)
 AtualizarTools.BorderSizePixel = 0
-AtualizarTools.Text = "Atualizar"
+AtualizarTools.Text = "ATUALIZAR"
 AtualizarTools.TextColor3 = Color3.fromRGB(235,235,235)
 AtualizarTools.Font = Enum.Font.GothamBold
 AtualizarTools.TextSize = 11
@@ -677,280 +721,516 @@ local atc = Instance.new("UICorner")
 atc.CornerRadius = UDim.new(0,5)
 atc.Parent = AtualizarTools
 
--- Guarda todas as Tools que o cliente conseguiu enxergar.
--- IMPORTANTE: LocalScript NÃO consegue enxergar ServerStorage/ServerScriptService.
+-- LocalScript só enxerga o que foi replicado para o cliente.
 local ToolsEncontradas = {}
 
 local function CaminhoSeguro(obj)
-	local ok, caminho = pcall(function()
-		return obj:GetFullName()
-	end)
+    local ok, caminho = pcall(function()
+        return obj:GetFullName()
+    end)
 
-	if ok then
-		return caminho
-	end
+    if ok then
+        return caminho
+    end
 
-	return obj.Name
+    return obj.Name
+end
+
+local function NormalizarNome(nome)
+    nome = tostring(nome or ""):lower()
+    nome = nome:gsub("[^%w]", "")
+    return nome
+end
+
+local function DistanciaTexto(a,b)
+    a = NormalizarNome(a)
+    b = NormalizarNome(b)
+
+    local la = #a
+    local lb = #b
+
+    if la == 0 then return lb end
+    if lb == 0 then return la end
+
+    local anterior = {}
+    for j = 0, lb do
+        anterior[j] = j
+    end
+
+    for i = 1, la do
+        local atual = {[0] = i}
+        local ca = a:sub(i,i)
+
+        for j = 1, lb do
+            local custo = (ca == b:sub(j,j)) and 0 or 1
+            atual[j] = math.min(
+                atual[j-1] + 1,
+                anterior[j] + 1,
+                anterior[j-1] + custo
+            )
+        end
+
+        anterior = atual
+    end
+
+    return anterior[lb]
+end
+
+local function PontuacaoNome(nome, alvo)
+    local n = NormalizarNome(nome)
+    local a = NormalizarNome(alvo)
+
+    if n == "" or a == "" then
+        return -1
+    end
+
+    if n == a then
+        return 1000
+    end
+
+    if n:find(a, 1, true) then
+        return 900 - math.abs(#n - #a)
+    end
+
+    if a:find(n, 1, true) then
+        return 850 - math.abs(#n - #a)
+    end
+
+    local distancia = DistanciaTexto(n, a)
+    local tamanho = math.max(#n, #a)
+
+    if tamanho <= 0 then
+        return -1
+    end
+
+    local semelhanca = 1 - (distancia / tamanho)
+
+    if semelhanca >= 0.55 then
+        return math.floor(semelhanca * 700)
+    end
+
+    return -1
 end
 
 local function DescobrirOrigem(tool)
-	local caminho = CaminhoSeguro(tool)
+    if tool:IsDescendantOf(workspace) then
+        return "Mapa / Workspace"
+    elseif tool:IsDescendantOf(ReplicatedStorage) then
+        return "ReplicatedStorage"
+    elseif tool:IsDescendantOf(game:GetService("StarterPack")) then
+        return "StarterPack"
+    elseif LocalPlayer.Character and tool:IsDescendantOf(LocalPlayer.Character) then
+        return "Seu personagem"
+    elseif LocalPlayer:FindFirstChildOfClass("Backpack") and tool:IsDescendantOf(LocalPlayer:FindFirstChildOfClass("Backpack")) then
+        return "Seu Backpack"
+    end
 
-	if tool:IsDescendantOf(workspace) then
-		return "Mapa / Workspace"
-	elseif tool:IsDescendantOf(ReplicatedStorage) then
-		return "ReplicatedStorage"
-	elseif tool:IsDescendantOf(game:GetService("StarterPack")) then
-		return "StarterPack"
-	elseif LocalPlayer.Character and tool:IsDescendantOf(LocalPlayer.Character) then
-		return "Seu personagem"
-	elseif LocalPlayer:FindFirstChildOfClass("Backpack") and tool:IsDescendantOf(LocalPlayer:FindFirstChildOfClass("Backpack")) then
-		return "Seu Backpack"
-	end
-
-	return caminho
+    return CaminhoSeguro(tool)
 end
 
 local function ColetarTools()
-	local resultado = {}
-	local encontrados = {}
+    local resultado = {}
+    local encontrados = {}
 
-	-- O cliente só recebe objetos que foram replicados para ele.
-	-- game:GetDescendants() procura em TUDO que estiver visível para o cliente.
-	for _, obj in ipairs(game:GetDescendants()) do
-		if obj:IsA("Tool") and obj.Archivable then
-			local caminho = CaminhoSeguro(obj)
+    for _, obj in ipairs(game:GetDescendants()) do
+        if obj:IsA("Tool") and obj.Archivable then
+            local caminho = CaminhoSeguro(obj)
 
-			if not encontrados[caminho] then
-				encontrados[caminho] = true
+            if not encontrados[caminho] then
+                encontrados[caminho] = true
 
-				table.insert(resultado, {
-					Name = obj.Name,
-					Location = DescobrirOrigem(obj),
-					Path = caminho,
-					Instance = obj,
-				})
-			end
-		end
-	end
+                table.insert(resultado, {
+                    Name = obj.Name,
+                    Location = DescobrirOrigem(obj),
+                    Path = caminho,
+                    Instance = obj,
+                    Score = 0,
+                })
+            end
+        end
+    end
 
-	table.sort(resultado, function(a,b)
-		local an = string.lower(a.Name)
-		local bn = string.lower(b.Name)
+    return resultado
+end
 
-		if an == bn then
-			return string.lower(a.Path) < string.lower(b.Path)
-		end
+local function LocalizarMelhorTool(nomeProcurado)
+    local melhor = nil
+    local melhorScore = -1
 
-		return an < bn
-	end)
+    for _, obj in ipairs(game:GetDescendants()) do
+        if obj:IsA("Tool") and obj.Archivable then
+            local score = PontuacaoNome(obj.Name, nomeProcurado)
 
-	return resultado
+            if score > melhorScore then
+                melhorScore = score
+                melhor = {
+                    Name = obj.Name,
+                    Location = DescobrirOrigem(obj),
+                    Path = CaminhoSeguro(obj),
+                    Instance = obj,
+                    Score = score,
+                }
+            end
+        end
+    end
+
+    return melhor, melhorScore
+end
+
+local function LocalizarToolsParecidas(nomeProcurado)
+    local resultado = {}
+    local vistos = {}
+
+    for _, obj in ipairs(game:GetDescendants()) do
+        if obj:IsA("Tool") and obj.Archivable then
+            local caminho = CaminhoSeguro(obj)
+
+            if not vistos[caminho] then
+                local score = PontuacaoNome(obj.Name, nomeProcurado)
+
+                if score >= 450 then
+                    vistos[caminho] = true
+
+                    table.insert(resultado, {
+                        Name = obj.Name,
+                        Location = DescobrirOrigem(obj),
+                        Path = caminho,
+                        Instance = obj,
+                        Score = score,
+                    })
+                end
+            end
+        end
+    end
+
+    table.sort(resultado, function(a,b)
+        if a.Score ~= b.Score then
+            return a.Score > b.Score
+        end
+        return string.lower(a.Name) < string.lower(b.Name)
+    end)
+
+    return resultado
 end
 
 local function LimparListaTools()
-	for _,obj in ipairs(ListaTools:GetChildren()) do
-		if obj:IsA("GuiObject") and obj ~= ListaLayout and obj ~= ListaPadding then
-			obj:Destroy()
-		end
-	end
+    for _,obj in ipairs(ListaTools:GetChildren()) do
+        if obj:IsA("GuiObject") and obj ~= ListaLayout and obj ~= ListaPadding then
+            obj:Destroy()
+        end
+    end
 end
 
 local function ResetarBotao(pegar)
-	if not pegar or not pegar.Parent then
-		return
-	end
+    if not pegar or not pegar.Parent then
+        return
+    end
 
-	pegar.Text = "PEGAR"
-	pegar.BackgroundColor3 = Color3.fromRGB(150,0,0)
+    pegar.Text = "PEGAR"
+    pegar.BackgroundColor3 = Color3.fromRGB(150,0,0)
 end
 
 local function JaPossuiTool(nome)
-	local backpack = LocalPlayer:FindFirstChildOfClass("Backpack")
+    local backpack = LocalPlayer:FindFirstChildOfClass("Backpack")
 
-	if backpack then
-		for _,obj in ipairs(backpack:GetChildren()) do
-			if obj:IsA("Tool") and obj.Name == nome then
-				return true
-			end
-		end
-	end
+    if backpack then
+        for _,obj in ipairs(backpack:GetChildren()) do
+            if obj:IsA("Tool") and obj.Name == nome then
+                return true
+            end
+        end
+    end
 
-	local character = LocalPlayer.Character
-	if character then
-		for _,obj in ipairs(character:GetChildren()) do
-			if obj:IsA("Tool") and obj.Name == nome then
-				return true
-			end
-		end
-	end
+    local character = LocalPlayer.Character
+    if character then
+        for _,obj in ipairs(character:GetChildren()) do
+            if obj:IsA("Tool") and obj.Name == nome then
+                return true
+            end
+        end
+    end
 
-	return false
+    return false
 end
 
 local function ColocarNoInventario(info, botao)
-	local tool = info.Instance
+    local tool = info and info.Instance
 
-	if not tool or not tool.Parent then
-		botao.Text = "TOOL SUMIU"
-		task.delay(1.5, function()
-			ResetarBotao(botao)
-		end)
-		return false
-	end
+    -- Se a entrada veio da busca manual, tenta localizar de novo.
+    if (not tool or not tool.Parent) and info and info.Name then
+        local localizada = LocalizarMelhorTool(info.Name)
+        if localizada then
+            tool = localizada.Instance
+        end
+    end
 
-	local backpack = LocalPlayer:FindFirstChildOfClass("Backpack")
-	if not backpack then
-		botao.Text = "BACKPACK NÃO ACHADA"
-		task.delay(1.5, function()
-			ResetarBotao(botao)
-		end)
-		return false
-	end
+    if not tool or not tool.Parent then
+        botao.Text = "NÃO LOCALIZADA"
+        task.delay(1.8, function()
+            ResetarBotao(botao)
+        end)
+        return false
+    end
 
-	if JaPossuiTool(tool.Name) then
-		botao.Text = "JÁ POSSUI"
-		task.delay(1.2, function()
-			ResetarBotao(botao)
-		end)
-		return false
-	end
+    local backpack = LocalPlayer:FindFirstChildOfClass("Backpack")
+    if not backpack then
+        botao.Text = "SEM BACKPACK"
+        task.delay(1.5, function()
+            ResetarBotao(botao)
+        end)
+        return false
+    end
 
-	-- Faz uma cópia completa da Tool que o cliente consegue enxergar.
-	local clone
-	local ok, err = pcall(function()
-		clone = tool:Clone()
-	end)
+    if JaPossuiTool(tool.Name) then
+        botao.Text = "JÁ POSSUI"
+        task.delay(1.2, function()
+            ResetarBotao(botao)
+        end)
+        return false
+    end
 
-	if not ok or not clone then
-		botao.Text = "NÃO PODE COPIAR"
-		task.delay(1.5, function()
-			ResetarBotao(botao)
-		end)
-		return false
-	end
+    local clone
+    local ok = pcall(function()
+        clone = tool:Clone()
+    end)
 
-	clone.Parent = backpack
+    if not ok or not clone then
+        botao.Text = "NÃO PODE COPIAR"
+        task.delay(1.5, function()
+            ResetarBotao(botao)
+        end)
+        return false
+    end
 
-	-- Confirma visualmente que chegou ao Backpack local.
-	task.defer(function()
-		if clone.Parent == backpack then
-			botao.Text = "NO INVENTÁRIO"
-			botao.BackgroundColor3 = Color3.fromRGB(30,120,55)
-		else
-			botao.Text = "FALHOU"
-		end
-	end)
+    clone.Parent = backpack
 
-	task.delay(1.8, function()
-		ResetarBotao(botao)
-	end)
+    task.defer(function()
+        if clone.Parent == backpack then
+            botao.Text = "NO INVENTÁRIO"
+            botao.BackgroundColor3 = Color3.fromRGB(30,120,55)
+        else
+            botao.Text = "FALHOU"
+        end
+    end)
 
-	return true
+    task.delay(2, function()
+        ResetarBotao(botao)
+    end)
+
+    return true
+end
+
+local function CriarItemTool(info, indice, destaque)
+    local item = Instance.new("Frame")
+    item.Name = "Tool_" .. indice
+    item.LayoutOrder = indice
+    item.Size = UDim2.new(1,-8,0,64)
+    item.BackgroundColor3 = destaque and Color3.fromRGB(55,36,36) or Color3.fromRGB(42,42,42)
+    item.BorderSizePixel = 0
+    item.Parent = ListaTools
+
+    local ic = Instance.new("UICorner")
+    ic.CornerRadius = UDim.new(0,5)
+    ic.Parent = item
+
+    local nome = Instance.new("TextLabel")
+    nome.Size = UDim2.new(1,-140,0,25)
+    nome.Position = UDim2.fromOffset(10,5)
+    nome.BackgroundTransparency = 1
+    nome.Text = info.Name
+    nome.TextColor3 = Color3.fromRGB(235,235,235)
+    nome.Font = Enum.Font.GothamBold
+    nome.TextSize = 12
+    nome.TextXAlignment = Enum.TextXAlignment.Left
+    nome.TextTruncate = Enum.TextTruncate.AtEnd
+    nome.Parent = item
+
+    local localizacao = Instance.new("TextLabel")
+    localizacao.Size = UDim2.new(1,-140,0,30)
+    localizacao.Position = UDim2.fromOffset(10,29)
+    localizacao.BackgroundTransparency = 1
+    localizacao.Text = info.Location or "Origem desconhecida"
+    localizacao.TextColor3 = Color3.fromRGB(145,145,145)
+    localizacao.Font = Enum.Font.Gotham
+    localizacao.TextSize = 9
+    localizacao.TextXAlignment = Enum.TextXAlignment.Left
+    localizacao.TextTruncate = Enum.TextTruncate.AtEnd
+    localizacao.Parent = item
+
+    local pegar = Instance.new("TextButton")
+    pegar.Size = UDim2.fromOffset(105,34)
+    pegar.Position = UDim2.new(1,-115,0.5,-17)
+    pegar.BackgroundColor3 = Color3.fromRGB(150,0,0)
+    pegar.BorderSizePixel = 0
+    pegar.Text = "PEGAR"
+    pegar.TextColor3 = Color3.fromRGB(255,255,255)
+    pegar.Font = Enum.Font.GothamBold
+    pegar.TextSize = 11
+    pegar.Parent = item
+
+    local pc = Instance.new("UICorner")
+    pc.CornerRadius = UDim.new(0,5)
+    pc.Parent = pegar
+
+    pegar.MouseButton1Click:Connect(function()
+        pegar.Text = "PEGANDO..."
+        ColocarNoInventario(info, pegar)
+    end)
 end
 
 local function MostrarTools(lista)
-	LimparListaTools()
-	ToolsEncontradas = lista or {}
+    LimparListaTools()
+    ToolsEncontradas = lista or {}
 
-	if not lista or #lista == 0 then
-		local vazio = Instance.new("TextLabel")
-		vazio.Size = UDim2.new(1,-8,0,75)
-		vazio.BackgroundTransparency = 1
-		vazio.Text = "Nenhuma Tool foi encontrada no conteúdo replicado para este jogador."
-		vazio.TextColor3 = Color3.fromRGB(150,150,150)
-		vazio.Font = Enum.Font.Gotham
-		vazio.TextSize = 12
-		vazio.TextWrapped = true
-		vazio.Parent = ListaTools
-		return
-	end
+    if not lista or #lista == 0 then
+        local vazio = Instance.new("TextLabel")
+        vazio.Size = UDim2.new(1,-8,0,75)
+        vazio.BackgroundTransparency = 1
+        vazio.Text = "Nenhuma Tool encontrada. Use o campo acima para procurar por nome."
+        vazio.TextColor3 = Color3.fromRGB(150,150,150)
+        vazio.Font = Enum.Font.Gotham
+        vazio.TextSize = 12
+        vazio.TextWrapped = true
+        vazio.Parent = ListaTools
+        return
+    end
 
-	for indice,info in ipairs(lista) do
-		local item = Instance.new("Frame")
-		item.Name = "Tool_" .. indice
-		item.Size = UDim2.new(1,-8,0,64)
-		item.BackgroundColor3 = Color3.fromRGB(42,42,42)
-		item.BorderSizePixel = 0
-		item.Parent = ListaTools
+    local alvo = NormalizarNome(CaixaBuscaTool.Text)
 
-		local ic = Instance.new("UICorner")
-		ic.CornerRadius = UDim.new(0,5)
-		ic.Parent = item
+    table.sort(lista, function(a,b)
+        local sa = PontuacaoNome(a.Name, alvo)
+        local sb = PontuacaoNome(b.Name, alvo)
+        if sa ~= sb then
+            return sa > sb
+        end
+        return string.lower(a.Name) < string.lower(b.Name)
+    end)
 
-		local nome = Instance.new("TextLabel")
-		nome.Size = UDim2.new(1,-140,0,25)
-		nome.Position = UDim2.fromOffset(10,5)
-		nome.BackgroundTransparency = 1
-		nome.Text = info.Name
-		nome.TextColor3 = Color3.fromRGB(235,235,235)
-		nome.Font = Enum.Font.GothamBold
-		nome.TextSize = 12
-		nome.TextXAlignment = Enum.TextXAlignment.Left
-		nome.TextTruncate = Enum.TextTruncate.AtEnd
-		nome.Parent = item
-
-		local localizacao = Instance.new("TextLabel")
-		localizacao.Size = UDim2.new(1,-140,0,30)
-		localizacao.Position = UDim2.fromOffset(10,29)
-		localizacao.BackgroundTransparency = 1
-		localizacao.Text = info.Location
-		localizacao.TextColor3 = Color3.fromRGB(145,145,145)
-		localizacao.Font = Enum.Font.Gotham
-		localizacao.TextSize = 9
-		localizacao.TextXAlignment = Enum.TextXAlignment.Left
-		localizacao.TextTruncate = Enum.TextTruncate.AtEnd
-		localizacao.Parent = item
-
-		local pegar = Instance.new("TextButton")
-		pegar.Size = UDim2.fromOffset(105,34)
-		pegar.Position = UDim2.new(1,-115,0.5,-17)
-		pegar.BackgroundColor3 = Color3.fromRGB(150,0,0)
-		pegar.BorderSizePixel = 0
-		pegar.Text = "PEGAR"
-		pegar.TextColor3 = Color3.fromRGB(255,255,255)
-		pegar.Font = Enum.Font.GothamBold
-		pegar.TextSize = 11
-		pegar.Parent = item
-
-		local pc = Instance.new("UICorner")
-		pc.CornerRadius = UDim.new(0,5)
-		pc.Parent = pegar
-
-		pegar.MouseButton1Click:Connect(function()
-			pegar.Text = "PEGANDO..."
-			ColocarNoInventario(info, pegar)
-		end)
-	end
+    for indice,info in ipairs(lista) do
+        CriarItemTool(info, indice, PontuacaoNome(info.Name, "ArmaPdsecreta") >= 850)
+    end
 end
 
 local function CarregarTools()
-	AtualizarTools.Text = "PROCURANDO..."
+    AtualizarTools.Text = "BUSCANDO..."
 
-	local ok, lista = pcall(ColetarTools)
+    local ok, lista = pcall(ColetarTools)
 
-	if ok then
-		MostrarTools(lista)
-		InfoTools.Text = tostring(#lista) .. " Tool(s) encontrada(s) no conteúdo visível ao cliente"
-	else
-		MostrarTools(nil)
-		InfoTools.Text = "Não foi possível fazer a busca"
-	end
+    if ok then
+        local temAlvo = false
+        for _, info in ipairs(lista) do
+            if PontuacaoNome(info.Name, "ArmaPdsecreta") >= 450 then
+                temAlvo = true
+                break
+            end
+        end
 
-	AtualizarTools.Text = "ATUALIZAR"
+        if not temAlvo then
+            table.insert(lista, 1, {
+                Name = "ArmaPdsecreta",
+                Location = "Busca manual / não localizada ainda",
+                Instance = nil,
+                Path = "",
+                Score = 0,
+            })
+        end
+
+        MostrarTools(lista)
+        InfoTools.Text = tostring(#lista) .. " entrada(s) encontrada(s); ArmaPdsecreta também fica disponível na busca manual"
+    else
+        MostrarTools({})
+        InfoTools.Text = "A busca automática falhou; use a busca manual"
+    end
+
+    AtualizarTools.Text = "ATUALIZAR"
 end
+
+local function ProcurarPorNome()
+    local alvo = CaixaBuscaTool.Text:gsub("^%s+", ""):gsub("%s+$", "")
+
+    if alvo == "" then
+        alvo = "ArmaPdsecreta"
+        CaixaBuscaTool.Text = alvo
+    end
+
+    BuscarTool.Text = "BUSCANDO..."
+    LimparListaTools()
+
+    local parecidas = LocalizarToolsParecidas(alvo)
+
+    if #parecidas > 0 then
+        InfoTools.Text = tostring(#parecidas) .. " Tool(s) encontrada(s) para: " .. alvo
+
+        for indice, info in ipairs(parecidas) do
+            CriarItemTool(info, indice, PontuacaoNome(info.Name, "ArmaPdsecreta") >= 850)
+        end
+    else
+        -- Entrada manual garantida para o nome digitado.
+        -- O clique tenta procurar novamente no momento de pegar.
+        local manual = {
+            Name = alvo,
+            Location = "Busca manual / não localizada ainda",
+            Instance = nil,
+            Path = "",
+        }
+
+        CriarItemTool(manual, 1, true)
+        InfoTools.Text = "Nenhuma Tool parecida foi localizada. A busca manual continua disponível."
+    end
+
+    BuscarTool.Text = "PROCURAR"
+end
+
+BuscarTool.MouseButton1Click:Connect(ProcurarPorNome)
+
+CaixaBuscaTool:GetPropertyChangedSignal("Text"):Connect(function()
+    local texto = CaixaBuscaTool.Text
+    if texto == "" then
+        MostrarTools(ToolsEncontradas)
+        InfoTools.Text = "Digite o nome da Tool para filtrar a lista"
+        return
+    end
+
+    local filtradas = LocalizarToolsParecidas(texto)
+
+    if #filtradas > 0 then
+        MostrarTools(filtradas)
+        InfoTools.Text = tostring(#filtradas) .. " Tool(s) encontrada(s) para: " .. texto
+    else
+        local manual = {
+            Name = texto,
+            Location = "Busca manual / não localizada ainda",
+            Instance = nil,
+            Path = "",
+            Score = 0,
+        }
+        MostrarTools({manual})
+        InfoTools.Text = "Nenhuma Tool encontrada. O botão PEGAR ainda tentará localizar: " .. texto
+    end
+end)
+
+CaixaBuscaTool.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
+        ProcurarPorNome()
+    end
+end)
 
 AtualizarTools.MouseButton1Click:Connect(CarregarTools)
 
--- Atualiza automaticamente quando novas Tools chegam ao cliente.
+-- Atualiza automaticamente quando uma Tool replicada chega ao cliente.
 game.DescendantAdded:Connect(function(obj)
-	if obj:IsA("Tool") and TelaTools.Visible then
-		task.delay(0.15, function()
-			if TelaTools.Visible then
-				CarregarTools()
-			end
-		end)
-	end
+    if obj:IsA("Tool") and TelaTools.Visible then
+        task.delay(0.2, function()
+            if TelaTools.Visible then
+                local termo = NormalizarNome(CaixaBuscaTool.Text)
+                if termo ~= "" then
+                    ProcurarPorNome()
+                else
+                    CarregarTools()
+                end
+            end
+        end)
+    end
 end)
 
 --========================================================
