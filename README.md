@@ -13,7 +13,7 @@ local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 local Camera = workspace.CurrentCamera
 
 --========================================================
--- CONFIGURAÇÕES
+-- CONFIGURAÃ‡Ã•ES
 --========================================================
 
 local ESP_ATIVADO = false
@@ -21,7 +21,7 @@ local FOV_ATIVADO = false
 local MIRA_ATIVADA = false
 local VIDA_INFINITA = false
 
-local PARTE_MIRA = "Cabeça"
+local PARTE_MIRA = "CabeÃ§a"
 local TAMANHO_FOV = 150
 local SUAVIDADE_MIRA = 0.18
 
@@ -111,7 +111,7 @@ local Minimizar = Instance.new("TextButton")
 Minimizar.Size = UDim2.fromOffset(35,35)
 Minimizar.Position = UDim2.new(1,-82,0,5)
 Minimizar.BackgroundTransparency = 1
-Minimizar.Text = "—"
+Minimizar.Text = "â€”"
 Minimizar.TextColor3 = Color3.fromRGB(220,220,220)
 Minimizar.Font = Enum.Font.GothamBold
 Minimizar.TextSize = 20
@@ -122,7 +122,7 @@ local Fechar = Instance.new("TextButton")
 Fechar.Size = UDim2.fromOffset(35,35)
 Fechar.Position = UDim2.new(1,-42,0,5)
 Fechar.BackgroundTransparency = 1
-Fechar.Text = "×"
+Fechar.Text = "Ã—"
 Fechar.TextColor3 = Color3.fromRGB(220,220,220)
 Fechar.Font = Enum.Font.GothamBold
 Fechar.TextSize = 25
@@ -230,16 +230,16 @@ local function CriarMenu(texto,y)
 	return b
 end
 
-local BotaoHome = CriarMenu("🏠  Home",8)
-local BotaoTP = CriarMenu("👤  TP Player",52)
-local BotaoMiraMenu = CriarMenu("◎  Mira",96)
-local BotaoConfig = CriarMenu("⚙  Configurações",140)
+local BotaoHome = CriarMenu("ðŸ   Home",8)
+local BotaoTP = CriarMenu("ðŸ‘¤  TP Player",52)
+local BotaoMiraMenu = CriarMenu("â—Ž  Mira",96)
+local BotaoConfig = CriarMenu("âš™  ConfiguraÃ§Ãµes",140)
 
 local Status = Instance.new("TextLabel")
 Status.Size = UDim2.new(1,-20,0,25)
 Status.Position = UDim2.new(0,10,1,-32)
 Status.BackgroundTransparency = 1
-Status.Text = "JF • Sistema de teste"
+Status.Text = "JF â€¢ Sistema de teste"
 Status.TextColor3 = Color3.fromRGB(120,120,120)
 Status.Font = Enum.Font.Gotham
 Status.TextSize = 11
@@ -247,7 +247,7 @@ Status.TextXAlignment = Enum.TextXAlignment.Left
 Status.Parent = Menu
 
 --========================================================
--- ÁREA DIREITA HOME
+-- ÃREA DIREITA HOME
 --========================================================
 
 local Home = Instance.new("ScrollingFrame")
@@ -283,7 +283,7 @@ tpc.CornerRadius = UDim.new(0,6)
 tpc.Parent = TelaTP
 
 --========================================================
--- TÍTULO TP
+-- TÃTULO TP
 --========================================================
 
 local TituloTP = Instance.new("TextLabel")
@@ -307,7 +307,7 @@ Pesquisa.Position = UDim2.fromOffset(12,45)
 Pesquisa.BackgroundColor3 = Color3.fromRGB(42,42,42)
 Pesquisa.BorderSizePixel = 0
 Pesquisa.Text = ""
-Pesquisa.PlaceholderText = "🔎  Pesquisar jogador..."
+Pesquisa.PlaceholderText = "ðŸ”Ž  Pesquisar jogador..."
 Pesquisa.PlaceholderColor3 = Color3.fromRGB(130,130,130)
 Pesquisa.TextColor3 = Color3.fromRGB(235,235,235)
 Pesquisa.Font = Enum.Font.Gotham
@@ -413,7 +413,7 @@ local function AtualizarPlayers()
 				Nome.Size = UDim2.new(1,-75,1,0)
 				Nome.Position = UDim2.fromOffset(10,0)
 				Nome.BackgroundTransparency = 1
-				Nome.Text = "👤  "..player.DisplayName.."  @"..player.Name
+				Nome.Text = "ðŸ‘¤  "..player.DisplayName.."  @"..player.Name
 				Nome.TextColor3 = Color3.fromRGB(235,235,235)
 				Nome.Font = Enum.Font.GothamBold
 				Nome.TextSize = 11
@@ -462,7 +462,7 @@ Players.PlayerRemoving:Connect(function()
 end)
 
 --========================================================
--- HOME - TÍTULO
+-- HOME - TÃTULO
 --========================================================
 
 local TituloHome = Instance.new("TextLabel")
@@ -477,7 +477,7 @@ TituloHome.TextXAlignment = Enum.TextXAlignment.Left
 TituloHome.Parent = Home
 
 --========================================================
--- FUNÇÃO OPÇÃO
+-- FUNÃ‡ÃƒO OPÃ‡ÃƒO
 --========================================================
 
 local function CriarOpcao(texto,y)
@@ -562,7 +562,7 @@ end
 --========================================================
 
 local BotaoESP,ToggleESP,BolaESP =
-	CriarOpcao("ESP • Caixa",50)
+	CriarOpcao("ESP â€¢ Caixa",50)
 
 BotaoESP.MouseButton1Click:Connect(function()
 
@@ -627,7 +627,7 @@ TextoParte.TextXAlignment = Enum.TextXAlignment.Left
 TextoParte.Parent = Home
 
 local Partes = {
-	"Cabeça",
+	"CabeÃ§a",
 	"Torso",
 	"Perna"
 }
@@ -795,7 +795,7 @@ UserInputService.InputChanged:Connect(function(input)
 end)
 
 --========================================================
--- CÍRCULO FOV
+-- CÃRCULO FOV
 --========================================================
 
 local CirculoFOV = Instance.new("Frame")
@@ -913,7 +913,7 @@ end
 
 local function PegarParte(character)
 
-	if PARTE_MIRA == "Cabeça" then
+	if PARTE_MIRA == "CabeÃ§a" then
 
 		return character:FindFirstChild("Head")
 
@@ -988,7 +988,7 @@ local function PegarAlvo()
 end
 
 --========================================================
--- AÇÕES
+-- AÃ‡Ã•ES
 --========================================================
 
 local function CriarAcao(texto,y)
@@ -1025,7 +1025,7 @@ TituloJogador.Parent = Home
 
 local BotaoSpawn =
 	CriarAcao(
-		"📍  Marcar Spawn Neste Local",
+		"ðŸ“  Marcar Spawn Neste Local",
 		380
 	)
 
@@ -1057,20 +1057,20 @@ BotaoSpawn.MouseButton1Click:Connect(function()
 	marcadorSpawn.Transparency = 0.25
 	marcadorSpawn.Parent = workspace
 
-	BotaoSpawn.Text = "✓  Spawn Marcado!"
+	BotaoSpawn.Text = "âœ“  Spawn Marcado!"
 
 	task.delay(1.5,function()
 
 		if BotaoSpawn.Parent then
 			BotaoSpawn.Text =
-				"📍  Marcar Spawn Neste Local"
+				"ðŸ“  Marcar Spawn Neste Local"
 		end
 	end)
 end)
 
 local BotaoVoltar =
 	CriarAcao(
-		"📌  Voltar Para Spawn",
+		"ðŸ“Œ  Voltar Para Spawn",
 		436
 	)
 
@@ -1079,13 +1079,13 @@ BotaoVoltar.MouseButton1Click:Connect(function()
 	if not spawnMarcado then
 
 		BotaoVoltar.Text =
-			"⚠  Marque um Spawn Primeiro"
+			"âš   Marque um Spawn Primeiro"
 
 		task.delay(1.5,function()
 
 			if BotaoVoltar.Parent then
 				BotaoVoltar.Text =
-					"📌  Voltar Para Spawn"
+					"ðŸ“Œ  Voltar Para Spawn"
 			end
 		end)
 
@@ -1111,7 +1111,7 @@ end)
 
 local BotaoVidaInfinita =
 	CriarAcao(
-		"❤️  Vida Infinita: DESLIGADA",
+		"â¤ï¸  Vida Infinita: DESLIGADA",
 		492
 	)
 
@@ -1168,7 +1168,7 @@ BotaoVidaInfinita.MouseButton1Click:Connect(function()
 	if VIDA_INFINITA then
 
 		BotaoVidaInfinita.Text =
-			"❤️  Vida Infinita: LIGADA"
+			"â¤ï¸  Vida Infinita: LIGADA"
 
 		if LocalPlayer.Character then
 			AtivarVida(LocalPlayer.Character)
@@ -1177,7 +1177,7 @@ BotaoVidaInfinita.MouseButton1Click:Connect(function()
 	else
 
 		BotaoVidaInfinita.Text =
-			"❤️  Vida Infinita: DESLIGADA"
+			"â¤ï¸  Vida Infinita: DESLIGADA"
 
 		DesconectarVida()
 	end
@@ -1189,7 +1189,7 @@ end)
 
 local BotaoVida =
 	CriarAcao(
-		"❤️  Regenerar Vida",
+		"â¤ï¸  Regenerar Vida",
 		548
 	)
 
@@ -1207,17 +1207,118 @@ BotaoVida.MouseButton1Click:Connect(function()
 			humanoid.MaxHealth
 
 		BotaoVida.Text =
-			"✓  Vida Completa!"
+			"âœ“  Vida Completa!"
 
 		task.delay(1.5,function()
 
 			if BotaoVida.Parent then
 				BotaoVida.Text =
-					"❤️  Regenerar Vida"
+					"â¤ï¸  Regenerar Vida"
 			end
 		end)
 	end
 end)
+
+
+--========================================================
+-- FOME E SEDE
+--========================================================
+
+local function DefinirNecessidade(nome, valor)
+	local alterou = false
+
+	-- Atributos do jogador
+	if LocalPlayer:GetAttribute(nome) ~= nil then
+		LocalPlayer:SetAttribute(nome, valor)
+		alterou = true
+	end
+
+	-- Valores dentro do Player
+	for _,obj in ipairs(LocalPlayer:GetDescendants()) do
+		if obj.Name == nome and (obj:IsA("NumberValue") or obj:IsA("IntValue")) then
+			obj.Value = valor
+			alterou = true
+		end
+	end
+
+	-- Valores dentro do personagem
+	local character = LocalPlayer.Character
+	if character then
+		for _,obj in ipairs(character:GetDescendants()) do
+			if obj.Name == nome and (obj:IsA("NumberValue") or obj:IsA("IntValue")) then
+				obj.Value = valor
+				alterou = true
+			end
+		end
+	end
+
+	-- Valores dentro do PlayerGui
+	for _,obj in ipairs(PlayerGui:GetDescendants()) do
+		if obj.Name == nome and (obj:IsA("NumberValue") or obj:IsA("IntValue")) then
+			obj.Value = valor
+			alterou = true
+		end
+	end
+
+	return alterou
+end
+
+local function ResultadoNecessidade(botao, textoOriginal, nome)
+	local encontrou = DefinirNecessidade(nome, 100)
+
+	if encontrou then
+		botao.Text = "âœ“  "..textoOriginal.." Completa!"
+	else
+		botao.Text = "âš   "..nome.." nÃ£o encontrado"
+	end
+
+	task.delay(1.5,function()
+		if botao and botao.Parent then
+			botao.Text = textoOriginal
+		end
+	end)
+end
+
+local TituloNecessidades = Instance.new("TextLabel")
+TituloNecessidades.Size = UDim2.new(1,-24,0,25)
+TituloNecessidades.Position = UDim2.fromOffset(12,604)
+TituloNecessidades.BackgroundTransparency = 1
+TituloNecessidades.Text = "NECESSIDADES"
+TituloNecessidades.TextColor3 = Color3.fromRGB(160,160,160)
+TituloNecessidades.Font = Enum.Font.GothamBold
+TituloNecessidades.TextSize = 11
+TituloNecessidades.TextXAlignment = Enum.TextXAlignment.Left
+TituloNecessidades.Parent = Home
+
+local BotaoFome =
+	CriarAcao(
+		"ðŸ—  Encher Barra de Fome",
+		634
+	)
+
+BotaoFome.MouseButton1Click:Connect(function()
+	ResultadoNecessidade(
+		BotaoFome,
+		"ðŸ—  Encher Barra de Fome",
+		"Fome"
+	)
+end)
+
+local BotaoSede =
+	CriarAcao(
+		"ðŸ’§  Encher Barra de Sede",
+		690
+	)
+
+BotaoSede.MouseButton1Click:Connect(function()
+	ResultadoNecessidade(
+		BotaoSede,
+		"ðŸ’§  Encher Barra de Sede",
+		"Sede"
+	)
+end)
+
+Home.CanvasSize = UDim2.fromOffset(0,755)
 
 --========================================================
 -- RESPAWN
@@ -1271,7 +1372,7 @@ local function AbrirTP()
 	TelaTP.Visible = true
 
 	Titulo.Text =
-		"JF PAINEL • TP PLAYER"
+		"JF PAINEL â€¢ TP PLAYER"
 
 	AtualizarPlayers()
 end
@@ -1343,7 +1444,7 @@ Minimizar.MouseButton1Click:Connect(function()
 				alturaPainel
 			)
 
-		Minimizar.Text = "—"
+		Minimizar.Text = "â€”"
 
 		AbrirHome()
 	end
@@ -1374,7 +1475,7 @@ Fechar.MouseButton1Click:Connect(function()
 end)
 
 --========================================================
--- ATUALIZAÇÃO
+-- ATUALIZAÃ‡ÃƒO
 --========================================================
 
 RunService.RenderStepped:Connect(function()
