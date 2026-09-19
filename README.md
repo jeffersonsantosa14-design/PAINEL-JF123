@@ -7,13 +7,14 @@
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 local Camera = workspace.CurrentCamera
 
 --========================================================
--- CONFIGURAÃ‡Ã•ES
+-- CONFIGURAÇÕES
 --========================================================
 
 local ESP_ATIVADO = false
@@ -21,7 +22,7 @@ local FOV_ATIVADO = false
 local MIRA_ATIVADA = false
 local VIDA_INFINITA = false
 
-local PARTE_MIRA = "CabeÃ§a"
+local PARTE_MIRA = "Cabeça"
 local TAMANHO_FOV = 150
 local SUAVIDADE_MIRA = 0.18
 
@@ -111,7 +112,7 @@ local Minimizar = Instance.new("TextButton")
 Minimizar.Size = UDim2.fromOffset(35,35)
 Minimizar.Position = UDim2.new(1,-82,0,5)
 Minimizar.BackgroundTransparency = 1
-Minimizar.Text = "â€”"
+Minimizar.Text = "—"
 Minimizar.TextColor3 = Color3.fromRGB(220,220,220)
 Minimizar.Font = Enum.Font.GothamBold
 Minimizar.TextSize = 20
@@ -122,7 +123,7 @@ local Fechar = Instance.new("TextButton")
 Fechar.Size = UDim2.fromOffset(35,35)
 Fechar.Position = UDim2.new(1,-42,0,5)
 Fechar.BackgroundTransparency = 1
-Fechar.Text = "Ã—"
+Fechar.Text = "×"
 Fechar.TextColor3 = Color3.fromRGB(220,220,220)
 Fechar.Font = Enum.Font.GothamBold
 Fechar.TextSize = 25
@@ -230,16 +231,16 @@ local function CriarMenu(texto,y)
 	return b
 end
 
-local BotaoHome = CriarMenu("ðŸ   Home",8)
-local BotaoTP = CriarMenu("ðŸ‘¤  TP Player",52)
-local BotaoMiraMenu = CriarMenu("â—Ž  Mira",96)
-local BotaoConfig = CriarMenu("âš™  ConfiguraÃ§Ãµes",140)
+local BotaoHome = CriarMenu("Home",8)
+local BotaoTP = CriarMenu("TP Player",52)
+local BotaoTools = CriarMenu("Tools",96)
+local BotaoConfig = CriarMenu("Configurações",140)
 
 local Status = Instance.new("TextLabel")
 Status.Size = UDim2.new(1,-20,0,25)
 Status.Position = UDim2.new(0,10,1,-32)
 Status.BackgroundTransparency = 1
-Status.Text = "JF â€¢ Sistema de teste"
+Status.Text = "JF • Sistema de teste"
 Status.TextColor3 = Color3.fromRGB(120,120,120)
 Status.Font = Enum.Font.Gotham
 Status.TextSize = 11
@@ -247,7 +248,7 @@ Status.TextXAlignment = Enum.TextXAlignment.Left
 Status.Parent = Menu
 
 --========================================================
--- ÃREA DIREITA HOME
+-- ÁREA DIREITA HOME
 --========================================================
 
 local Home = Instance.new("ScrollingFrame")
@@ -283,7 +284,7 @@ tpc.CornerRadius = UDim.new(0,6)
 tpc.Parent = TelaTP
 
 --========================================================
--- TÃTULO TP
+-- TÍTULO TP
 --========================================================
 
 local TituloTP = Instance.new("TextLabel")
@@ -307,7 +308,7 @@ Pesquisa.Position = UDim2.fromOffset(12,45)
 Pesquisa.BackgroundColor3 = Color3.fromRGB(42,42,42)
 Pesquisa.BorderSizePixel = 0
 Pesquisa.Text = ""
-Pesquisa.PlaceholderText = "ðŸ”Ž  Pesquisar jogador..."
+Pesquisa.PlaceholderText = "Pesquisar jogador..."
 Pesquisa.PlaceholderColor3 = Color3.fromRGB(130,130,130)
 Pesquisa.TextColor3 = Color3.fromRGB(235,235,235)
 Pesquisa.Font = Enum.Font.Gotham
@@ -413,7 +414,7 @@ local function AtualizarPlayers()
 				Nome.Size = UDim2.new(1,-75,1,0)
 				Nome.Position = UDim2.fromOffset(10,0)
 				Nome.BackgroundTransparency = 1
-				Nome.Text = "ðŸ‘¤  "..player.DisplayName.."  @"..player.Name
+				Nome.Text = "👤  "..player.DisplayName.."  @"..player.Name
 				Nome.TextColor3 = Color3.fromRGB(235,235,235)
 				Nome.Font = Enum.Font.GothamBold
 				Nome.TextSize = 11
@@ -462,7 +463,7 @@ Players.PlayerRemoving:Connect(function()
 end)
 
 --========================================================
--- HOME - TÃTULO
+-- HOME - TÍTULO
 --========================================================
 
 local TituloHome = Instance.new("TextLabel")
@@ -477,7 +478,7 @@ TituloHome.TextXAlignment = Enum.TextXAlignment.Left
 TituloHome.Parent = Home
 
 --========================================================
--- FUNÃ‡ÃƒO OPÃ‡ÃƒO
+-- FUNÇÃO OPÇÃO
 --========================================================
 
 local function CriarOpcao(texto,y)
@@ -562,7 +563,7 @@ end
 --========================================================
 
 local BotaoESP,ToggleESP,BolaESP =
-	CriarOpcao("ESP â€¢ Caixa",50)
+	CriarOpcao("ESP • Caixa",50)
 
 BotaoESP.MouseButton1Click:Connect(function()
 
@@ -592,6 +593,337 @@ BotaoFOV.MouseButton1Click:Connect(function()
 		FOV_ATIVADO
 	)
 end)
+
+--========================================================
+-- TELA TOOLS - LOCAL SCRIPT ÚNICO
+--========================================================
+
+local TelaTools = Instance.new("Frame")
+TelaTools.Name = "TelaTools"
+TelaTools.Size = UDim2.new(1,-157,1,-61)
+TelaTools.Position = UDim2.fromOffset(149,53)
+TelaTools.BackgroundColor3 = Color3.fromRGB(30,30,30)
+TelaTools.BorderSizePixel = 0
+TelaTools.Visible = false
+TelaTools.Parent = Painel
+
+local tc = Instance.new("UICorner")
+tc.CornerRadius = UDim.new(0,6)
+tc.Parent = TelaTools
+
+local TituloTools = Instance.new("TextLabel")
+TituloTools.Size = UDim2.new(1,-150,0,32)
+TituloTools.Position = UDim2.fromOffset(12,10)
+TituloTools.BackgroundTransparency = 1
+TituloTools.Text = "TOOLS DO SERVIDOR"
+TituloTools.TextColor3 = Color3.fromRGB(235,235,235)
+TituloTools.Font = Enum.Font.GothamBold
+TituloTools.TextSize = 15
+TituloTools.TextXAlignment = Enum.TextXAlignment.Left
+TituloTools.Parent = TelaTools
+
+local InfoTools = Instance.new("TextLabel")
+InfoTools.Size = UDim2.new(1,-24,0,25)
+InfoTools.Position = UDim2.fromOffset(12,42)
+InfoTools.BackgroundTransparency = 1
+InfoTools.Text = "Tools visíveis no mapa e armazenadas nos serviços replicados"
+InfoTools.TextColor3 = Color3.fromRGB(145,145,145)
+InfoTools.Font = Enum.Font.Gotham
+InfoTools.TextSize = 10
+InfoTools.TextXAlignment = Enum.TextXAlignment.Left
+InfoTools.Parent = TelaTools
+
+local ListaTools = Instance.new("ScrollingFrame")
+ListaTools.Name = "ListaTools"
+ListaTools.Size = UDim2.new(1,-24,1,-86)
+ListaTools.Position = UDim2.fromOffset(12,78)
+ListaTools.BackgroundColor3 = Color3.fromRGB(24,24,24)
+ListaTools.BorderSizePixel = 0
+ListaTools.ScrollBarThickness = 5
+ListaTools.ScrollBarImageColor3 = Color3.fromRGB(150,0,0)
+ListaTools.CanvasSize = UDim2.fromOffset(0,0)
+ListaTools.AutomaticCanvasSize = Enum.AutomaticSize.Y
+ListaTools.Parent = TelaTools
+
+local ltc = Instance.new("UICorner")
+ltc.CornerRadius = UDim.new(0,6)
+ltc.Parent = ListaTools
+
+local ListaLayout = Instance.new("UIListLayout")
+ListaLayout.Padding = UDim.new(0,6)
+ListaLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+ListaLayout.SortOrder = Enum.SortOrder.Name
+ListaLayout.Parent = ListaTools
+
+local ListaPadding = Instance.new("UIPadding")
+ListaPadding.PaddingTop = UDim.new(0,8)
+ListaPadding.PaddingBottom = UDim.new(0,8)
+ListaPadding.PaddingLeft = UDim.new(0,8)
+ListaPadding.PaddingRight = UDim.new(0,8)
+ListaPadding.Parent = ListaTools
+
+local AtualizarTools = Instance.new("TextButton")
+AtualizarTools.Size = UDim2.fromOffset(120,30)
+AtualizarTools.Position = UDim2.new(1,-132,0,10)
+AtualizarTools.BackgroundColor3 = Color3.fromRGB(42,42,42)
+AtualizarTools.BorderSizePixel = 0
+AtualizarTools.Text = "Atualizar"
+AtualizarTools.TextColor3 = Color3.fromRGB(235,235,235)
+AtualizarTools.Font = Enum.Font.GothamBold
+AtualizarTools.TextSize = 11
+AtualizarTools.Parent = TelaTools
+
+local atc = Instance.new("UICorner")
+atc.CornerRadius = UDim.new(0,5)
+atc.Parent = AtualizarTools
+
+-- Guarda o caminho físico de cada Tool encontrada.
+local ToolsEncontradas = {}
+
+local function LerLocalizacao(tool)
+	local parent = tool.Parent
+	if parent == workspace or tool:IsDescendantOf(workspace) then
+		return "Workspace"
+	end
+
+	if tool:IsDescendantOf(ReplicatedStorage) then
+		return "ReplicatedStorage"
+	end
+
+	local starterPack = game:GetService("StarterPack")
+	if tool:IsDescendantOf(starterPack) then
+		return "StarterPack"
+	end
+
+	return parent and parent:GetFullName() or "Desconhecido"
+end
+
+local function ColetarTools()
+	local resultado = {}
+	local usados = {}
+
+	-- Workspace = Tools espalhadas pelo mapa.
+	for _,obj in ipairs(workspace:GetDescendants()) do
+		if obj:IsA("Tool") and obj.Archivable then
+			local chave = obj:GetFullName()
+			if not usados[chave] then
+				usados[chave] = true
+				table.insert(resultado, {
+					Name = obj.Name,
+					Location = "Workspace",
+					Instance = obj,
+				})
+			end
+		end
+	end
+
+	-- ReplicatedStorage = Tools replicadas para o cliente.
+	for _,obj in ipairs(ReplicatedStorage:GetDescendants()) do
+		if obj:IsA("Tool") and obj.Archivable then
+			local chave = obj:GetFullName()
+			if not usados[chave] then
+				usados[chave] = true
+				table.insert(resultado, {
+					Name = obj.Name,
+					Location = "ReplicatedStorage",
+					Instance = obj,
+				})
+			end
+		end
+	end
+
+	-- StarterPack = Tools que o jogo entrega normalmente ao spawnar.
+	local starterPack = game:GetService("StarterPack")
+	for _,obj in ipairs(starterPack:GetDescendants()) do
+		if obj:IsA("Tool") and obj.Archivable then
+			local chave = obj:GetFullName()
+			if not usados[chave] then
+				usados[chave] = true
+				table.insert(resultado, {
+					Name = obj.Name,
+					Location = "StarterPack",
+					Instance = obj,
+				})
+			end
+		end
+	end
+
+	table.sort(resultado,function(a,b)
+		local an = string.lower(a.Name)
+		local bn = string.lower(b.Name)
+		if an == bn then
+			return a.Location < b.Location
+		end
+		return an < bn
+	end)
+
+	return resultado
+end
+
+local function LimparListaTools()
+	for _,obj in ipairs(ListaTools:GetChildren()) do
+		if obj:IsA("GuiObject") and obj ~= ListaLayout and obj ~= ListaPadding then
+			obj:Destroy()
+		end
+	end
+end
+
+local function ColocarNoInventario(info,botao)
+	local tool = info.Instance
+	if not tool or not tool.Parent then
+		botao.Text = "NÃO ENCONTRADA"
+		return false
+	end
+
+	local backpack = LocalPlayer:FindFirstChildOfClass("Backpack")
+	if not backpack then
+		botao.Text = "BACKPACK NÃO ACHADA"
+		return false
+	end
+
+	local jaTem = false
+	for _,obj in ipairs(backpack:GetChildren()) do
+		if obj:IsA("Tool") and obj.Name == tool.Name then
+			jaTem = true
+			break
+		end
+	end
+
+	if LocalPlayer.Character then
+		for _,obj in ipairs(LocalPlayer.Character:GetChildren()) do
+			if obj:IsA("Tool") and obj.Name == tool.Name then
+				jaTem = true
+				break
+			end
+		end
+	end
+
+	if jaTem then
+		botao.Text = "JÁ POSSUI"
+		task.delay(1.2,function()
+			if botao.Parent then
+				botao.Text = "PEGAR"
+			end
+		end)
+		return false
+	end
+
+	local clone
+	local ok = pcall(function()
+		clone = tool:Clone()
+	end)
+
+	if not ok or not clone then
+		botao.Text = "NÃO PODE COPIAR"
+		return false
+	end
+
+	clone.Parent = backpack
+	botao.Text = "ADQUIRIDA"
+	botao.BackgroundColor3 = Color3.fromRGB(30,120,55)
+
+	task.delay(1.5,function()
+		if botao.Parent then
+			botao.Text = "PEGAR"
+			botao.BackgroundColor3 = Color3.fromRGB(150,0,0)
+		end
+	end)
+
+	return true
+end
+
+local function MostrarTools(lista)
+	LimparListaTools()
+	ToolsEncontradas = lista or {}
+
+	if not lista or #lista == 0 then
+		local vazio = Instance.new("TextLabel")
+		vazio.Size = UDim2.new(1,-8,0,60)
+		vazio.BackgroundTransparency = 1
+		vazio.Text = "Nenhuma Tool encontrada nos locais visíveis."
+		vazio.TextColor3 = Color3.fromRGB(150,150,150)
+		vazio.Font = Enum.Font.Gotham
+		vazio.TextSize = 12
+		vazio.Parent = ListaTools
+		return
+	end
+
+	for indice,info in ipairs(lista) do
+		local item = Instance.new("Frame")
+		item.Name = "Tool_" .. indice
+		item.Size = UDim2.new(1,-8,0,56)
+		item.BackgroundColor3 = Color3.fromRGB(42,42,42)
+		item.BorderSizePixel = 0
+		item.Parent = ListaTools
+
+		local ic = Instance.new("UICorner")
+		ic.CornerRadius = UDim.new(0,5)
+		ic.Parent = item
+
+		local nome = Instance.new("TextLabel")
+		nome.Size = UDim2.new(1,-130,0,25)
+		nome.Position = UDim2.fromOffset(10,5)
+		nome.BackgroundTransparency = 1
+		nome.Text = info.Name
+		nome.TextColor3 = Color3.fromRGB(235,235,235)
+		nome.Font = Enum.Font.GothamBold
+		nome.TextSize = 12
+		nome.TextXAlignment = Enum.TextXAlignment.Left
+		nome.TextTruncate = Enum.TextTruncate.AtEnd
+		nome.Parent = item
+
+		local localizacao = Instance.new("TextLabel")
+		localizacao.Size = UDim2.new(1,-130,0,20)
+		localizacao.Position = UDim2.fromOffset(10,30)
+		localizacao.BackgroundTransparency = 1
+		localizacao.Text = info.Location
+		localizacao.TextColor3 = Color3.fromRGB(145,145,145)
+		localizacao.Font = Enum.Font.Gotham
+		localizacao.TextSize = 10
+		localizacao.TextXAlignment = Enum.TextXAlignment.Left
+		localizacao.TextTruncate = Enum.TextTruncate.AtEnd
+		localizacao.Parent = item
+
+		local pegar = Instance.new("TextButton")
+		pegar.Size = UDim2.fromOffset(105,34)
+		pegar.Position = UDim2.new(1,-115,0.5,-17)
+		pegar.BackgroundColor3 = Color3.fromRGB(150,0,0)
+		pegar.BorderSizePixel = 0
+		pegar.Text = "PEGAR"
+		pegar.TextColor3 = Color3.fromRGB(255,255,255)
+		pegar.Font = Enum.Font.GothamBold
+		pegar.TextSize = 11
+		pegar.Parent = item
+
+		local pc = Instance.new("UICorner")
+		pc.CornerRadius = UDim.new(0,5)
+		pc.Parent = pegar
+
+		pegar.MouseButton1Click:Connect(function()
+			pegar.Text = "PEGANDO..."
+			ColocarNoInventario(info,pegar)
+		end)
+	end
+end
+
+local function CarregarTools()
+	AtualizarTools.Text = "Procurando..."
+
+	local ok,lista = pcall(ColetarTools)
+	if ok then
+		MostrarTools(lista)
+	else
+		MostrarTools(nil)
+	end
+
+	AtualizarTools.Text = "Atualizar"
+end
+
+AtualizarTools.MouseButton1Click:Connect(CarregarTools)
+
+--========================================================
+-- MIRA
+--========================================================
 
 --========================================================
 -- MIRA
@@ -627,7 +959,7 @@ TextoParte.TextXAlignment = Enum.TextXAlignment.Left
 TextoParte.Parent = Home
 
 local Partes = {
-	"CabeÃ§a",
+	"Cabeça",
 	"Torso",
 	"Perna"
 }
@@ -795,7 +1127,7 @@ UserInputService.InputChanged:Connect(function(input)
 end)
 
 --========================================================
--- CÃRCULO FOV
+-- CÍRCULO FOV
 --========================================================
 
 local CirculoFOV = Instance.new("Frame")
@@ -913,7 +1245,7 @@ end
 
 local function PegarParte(character)
 
-	if PARTE_MIRA == "CabeÃ§a" then
+	if PARTE_MIRA == "Cabeça" then
 
 		return character:FindFirstChild("Head")
 
@@ -988,7 +1320,7 @@ local function PegarAlvo()
 end
 
 --========================================================
--- AÃ‡Ã•ES
+-- AÇÕES
 --========================================================
 
 local function CriarAcao(texto,y)
@@ -1025,7 +1357,7 @@ TituloJogador.Parent = Home
 
 local BotaoSpawn =
 	CriarAcao(
-		"ðŸ“  Marcar Spawn Neste Local",
+		"Marcar Spawn Neste Local",
 		380
 	)
 
@@ -1057,20 +1389,20 @@ BotaoSpawn.MouseButton1Click:Connect(function()
 	marcadorSpawn.Transparency = 0.25
 	marcadorSpawn.Parent = workspace
 
-	BotaoSpawn.Text = "âœ“  Spawn Marcado!"
+	BotaoSpawn.Text = "✓  Spawn Marcado!"
 
 	task.delay(1.5,function()
 
 		if BotaoSpawn.Parent then
 			BotaoSpawn.Text =
-				"ðŸ“  Marcar Spawn Neste Local"
+				"Marcar Spawn Neste Local"
 		end
 	end)
 end)
 
 local BotaoVoltar =
 	CriarAcao(
-		"ðŸ“Œ  Voltar Para Spawn",
+		"Voltar Para Spawn",
 		436
 	)
 
@@ -1079,13 +1411,13 @@ BotaoVoltar.MouseButton1Click:Connect(function()
 	if not spawnMarcado then
 
 		BotaoVoltar.Text =
-			"âš   Marque um Spawn Primeiro"
+			"Marque um Spawn Primeiro"
 
 		task.delay(1.5,function()
 
 			if BotaoVoltar.Parent then
 				BotaoVoltar.Text =
-					"ðŸ“Œ  Voltar Para Spawn"
+					"Voltar Para Spawn"
 			end
 		end)
 
@@ -1111,7 +1443,7 @@ end)
 
 local BotaoVidaInfinita =
 	CriarAcao(
-		"â¤ï¸  Vida Infinita: DESLIGADA",
+		"Vida Infinita: DESLIGADA",
 		492
 	)
 
@@ -1168,7 +1500,7 @@ BotaoVidaInfinita.MouseButton1Click:Connect(function()
 	if VIDA_INFINITA then
 
 		BotaoVidaInfinita.Text =
-			"â¤ï¸  Vida Infinita: LIGADA"
+			"Vida Infinita: LIGADA"
 
 		if LocalPlayer.Character then
 			AtivarVida(LocalPlayer.Character)
@@ -1177,7 +1509,7 @@ BotaoVidaInfinita.MouseButton1Click:Connect(function()
 	else
 
 		BotaoVidaInfinita.Text =
-			"â¤ï¸  Vida Infinita: DESLIGADA"
+			"Vida Infinita: DESLIGADA"
 
 		DesconectarVida()
 	end
@@ -1189,7 +1521,7 @@ end)
 
 local BotaoVida =
 	CriarAcao(
-		"â¤ï¸  Regenerar Vida",
+		"Regenerar Vida",
 		548
 	)
 
@@ -1207,13 +1539,13 @@ BotaoVida.MouseButton1Click:Connect(function()
 			humanoid.MaxHealth
 
 		BotaoVida.Text =
-			"âœ“  Vida Completa!"
+			"✓  Vida Completa!"
 
 		task.delay(1.5,function()
 
 			if BotaoVida.Parent then
 				BotaoVida.Text =
-					"â¤ï¸  Regenerar Vida"
+					"Regenerar Vida"
 			end
 		end)
 	end
@@ -1226,7 +1558,7 @@ end)
 
 local BotaoFome =
 	CriarAcao(
-		"ðŸ—  Encher Barra de Fome",
+		"Encher Barra de Fome",
 		604
 	)
 
@@ -1243,7 +1575,7 @@ local function EncherFome()
 		fome.Value = 100
 	end
 
-	-- TambÃ©m suporta sistemas que usam Attribute.
+	-- Também suporta sistemas que usam Attribute.
 	if LocalPlayer:GetAttribute("Fome") ~= nil then
 		LocalPlayer:SetAttribute("Fome",100)
 	end
@@ -1259,13 +1591,13 @@ BotaoFome.MouseButton1Click:Connect(function()
 
 	EncherFome()
 
-	BotaoFome.Text = "âœ“  Fome Completa!"
+	BotaoFome.Text = "✓  Fome Completa!"
 
 	task.delay(1.5,function()
 
 		if BotaoFome.Parent then
 			BotaoFome.Text =
-				"ðŸ—  Encher Barra de Fome"
+				"Encher Barra de Fome"
 		end
 	end)
 end)
@@ -1277,7 +1609,7 @@ end)
 
 local BotaoSede =
 	CriarAcao(
-		"ðŸ’§  Encher Barra de Sede",
+		"Encher Barra de Sede",
 		660
 	)
 
@@ -1294,7 +1626,7 @@ local function EncherSede()
 		sede.Value = 100
 	end
 
-	-- TambÃ©m suporta sistemas que usam Attribute.
+	-- Também suporta sistemas que usam Attribute.
 	if LocalPlayer:GetAttribute("Sede") ~= nil then
 		LocalPlayer:SetAttribute("Sede",100)
 	end
@@ -1310,13 +1642,13 @@ BotaoSede.MouseButton1Click:Connect(function()
 
 	EncherSede()
 
-	BotaoSede.Text = "âœ“  Sede Completa!"
+	BotaoSede.Text = "✓  Sede Completa!"
 
 	task.delay(1.5,function()
 
 		if BotaoSede.Parent then
 			BotaoSede.Text =
-				"ðŸ’§  Encher Barra de Sede"
+				"Encher Barra de Sede"
 		end
 	end)
 end)
@@ -1360,6 +1692,7 @@ local function AbrirHome()
 
 	Home.Visible = true
 	TelaTP.Visible = false
+	TelaTools.Visible = false
 
 	Titulo.Text = "JF PAINEL"
 
@@ -1371,9 +1704,10 @@ local function AbrirTP()
 
 	Home.Visible = false
 	TelaTP.Visible = true
+	TelaTools.Visible = false
 
 	Titulo.Text =
-		"JF PAINEL â€¢ TP PLAYER"
+		"JF PAINEL • TP PLAYER"
 
 	AtualizarPlayers()
 end
@@ -1386,15 +1720,13 @@ BotaoTP.MouseButton1Click:Connect(function()
 	AbrirTP()
 end)
 
-BotaoMiraMenu.MouseButton1Click:Connect(function()
+BotaoTools.MouseButton1Click:Connect(function()
+	Home.Visible = false
+	TelaTP.Visible = false
+	TelaTools.Visible = true
 
-	AbrirHome()
-
-	task.defer(function()
-
-		Home.CanvasPosition =
-			Vector2.new(0,150)
-	end)
+	Titulo.Text = "JF PAINEL • TOOLS"
+	CarregarTools()
 end)
 
 BotaoConfig.MouseButton1Click:Connect(function()
@@ -1445,7 +1777,7 @@ Minimizar.MouseButton1Click:Connect(function()
 				alturaPainel
 			)
 
-		Minimizar.Text = "â€”"
+		Minimizar.Text = "—"
 
 		AbrirHome()
 	end
@@ -1476,7 +1808,7 @@ Fechar.MouseButton1Click:Connect(function()
 end)
 
 --========================================================
--- ATUALIZAÃ‡ÃƒO
+-- ATUALIZAÇÃO
 --========================================================
 
 RunService.RenderStepped:Connect(function()
