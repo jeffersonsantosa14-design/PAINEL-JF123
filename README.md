@@ -1,17 +1,16 @@
 --========================================================
 -- JF PAINEL
--- LOCAL SCRIPT ÚNICO
+-- HOME + TP PLAYER
+-- ESP + FOV + MIRA + SPAWN + VIDA
 --========================================================
 
---// SERVIÇOS
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
---// PLAYER
-local Player = Players.LocalPlayer
-local PlayerGui = Player:WaitForChild("PlayerGui")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 local Camera = workspace.CurrentCamera
 
 --========================================================
@@ -34,7 +33,7 @@ local conexaoVida = nil
 local personagemProtegido = nil
 
 --========================================================
--- REMOVE PAINEL ANTIGO
+-- REMOVER PAINEL ANTIGO
 --========================================================
 
 local antigo = PlayerGui:FindFirstChild("JF_Painel")
@@ -44,114 +43,124 @@ if antigo then
 end
 
 --========================================================
--- GUI PRINCIPAL
+-- SCREEN GUI
 --========================================================
 
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "JF_Painel"
-ScreenGui.ResetOnSpawn = false
-ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-ScreenGui.Parent = PlayerGui
+local Interface = Instance.new("ScreenGui")
+Interface.Name = "JF_Painel"
+Interface.ResetOnSpawn = false
+Interface.IgnoreGuiInset = true
+Interface.Parent = PlayerGui
 
 --========================================================
--- PAINEL
+-- TAMANHO
+--========================================================
+
+local viewport = Camera.ViewportSize
+
+local larguraPainel = math.clamp(viewport.X * 0.82, 430, 600)
+local alturaPainel = math.clamp(viewport.Y * 0.62, 300, 390)
+
+--========================================================
+-- PAINEL PRINCIPAL
 --========================================================
 
 local Painel = Instance.new("Frame")
-Painel.Name = "Painel"
-Painel.Size = UDim2.new(0, 500, 0, 350)
-Painel.Position = UDim2.new(0.5, -250, 0.5, -175)
-Painel.BackgroundColor3 = Color3.fromRGB(24, 24, 27)
+Painel.Name = "PainelPrincipal"
+Painel.Size = UDim2.fromOffset(larguraPainel, alturaPainel)
+Painel.AnchorPoint = Vector2.new(0.5, 0.5)
+Painel.Position = UDim2.fromScale(0.5, 0.5)
+Painel.BackgroundColor3 = Color3.fromRGB(25,25,25)
 Painel.BorderSizePixel = 0
-Painel.Parent = ScreenGui
+Painel.ClipsDescendants = true
+Painel.Parent = Interface
 
-local PainelCanto = Instance.new("UICorner")
-PainelCanto.CornerRadius = UDim.new(0, 8)
-PainelCanto.Parent = Painel
+local pc = Instance.new("UICorner")
+pc.CornerRadius = UDim.new(0,8)
+pc.Parent = Painel
+
+local ps = Instance.new("UIStroke")
+ps.Color = Color3.fromRGB(55,55,55)
+ps.Parent = Painel
 
 --========================================================
 -- TOPO
 --========================================================
 
 local Topo = Instance.new("Frame")
-Topo.Name = "Topo"
-Topo.Size = UDim2.new(1, 0, 0, 45)
-Topo.BackgroundColor3 = Color3.fromRGB(31, 31, 35)
+Topo.Size = UDim2.new(1,0,0,45)
+Topo.BackgroundColor3 = Color3.fromRGB(30,30,30)
 Topo.BorderSizePixel = 0
+Topo.ZIndex = 10
 Topo.Parent = Painel
 
-local TopoCanto = Instance.new("UICorner")
-TopoCanto.CornerRadius = UDim.new(0, 8)
-TopoCanto.Parent = Topo
+local tc = Instance.new("UICorner")
+tc.CornerRadius = UDim.new(0,8)
+tc.Parent = Topo
 
 local Titulo = Instance.new("TextLabel")
-Titulo.Size = UDim2.new(1, -100, 1, 0)
-Titulo.Position = UDim2.new(0, 15, 0, 0)
+Titulo.Size = UDim2.new(1,-100,1,0)
+Titulo.Position = UDim2.fromOffset(15,0)
 Titulo.BackgroundTransparency = 1
 Titulo.Text = "JF PAINEL"
-Titulo.TextColor3 = Color3.fromRGB(255, 255, 255)
+Titulo.TextColor3 = Color3.fromRGB(255,255,255)
 Titulo.Font = Enum.Font.GothamBold
-Titulo.TextSize = 18
+Titulo.TextSize = 19
 Titulo.TextXAlignment = Enum.TextXAlignment.Left
 Titulo.Parent = Topo
 
 local Minimizar = Instance.new("TextButton")
-Minimizar.Name = "Minimizar"
-Minimizar.Size = UDim2.new(0, 35, 0, 30)
-Minimizar.Position = UDim2.new(1, -75, 0, 7)
-Minimizar.BackgroundColor3 = Color3.fromRGB(45, 45, 50)
-Minimizar.Text = "-"
-Minimizar.TextColor3 = Color3.fromRGB(255, 255, 255)
+Minimizar.Size = UDim2.fromOffset(35,35)
+Minimizar.Position = UDim2.new(1,-82,0,5)
+Minimizar.BackgroundTransparency = 1
+Minimizar.Text = "—"
+Minimizar.TextColor3 = Color3.fromRGB(220,220,220)
 Minimizar.Font = Enum.Font.GothamBold
 Minimizar.TextSize = 20
-Minimizar.BorderSizePixel = 0
+Minimizar.ZIndex = 11
 Minimizar.Parent = Topo
 
-local MinimizarCanto = Instance.new("UICorner")
-MinimizarCanto.CornerRadius = UDim.new(0, 5)
-MinimizarCanto.Parent = Minimizar
-
 local Fechar = Instance.new("TextButton")
-Fechar.Name = "Fechar"
-Fechar.Size = UDim2.new(0, 35, 0, 30)
-Fechar.Position = UDim2.new(1, -38, 0, 7)
-Fechar.BackgroundColor3 = Color3.fromRGB(170, 45, 45)
-Fechar.Text = "X"
-Fechar.TextColor3 = Color3.fromRGB(255, 255, 255)
+Fechar.Size = UDim2.fromOffset(35,35)
+Fechar.Position = UDim2.new(1,-42,0,5)
+Fechar.BackgroundTransparency = 1
+Fechar.Text = "×"
+Fechar.TextColor3 = Color3.fromRGB(220,220,220)
 Fechar.Font = Enum.Font.GothamBold
-Fechar.TextSize = 15
-Fechar.BorderSizePixel = 0
+Fechar.TextSize = 25
+Fechar.ZIndex = 11
 Fechar.Parent = Topo
 
-local FecharCanto = Instance.new("UICorner")
-FecharCanto.CornerRadius = UDim.new(0, 5)
-FecharCanto.Parent = Fechar
-
 --========================================================
--- ARRASTAR PAINEL
+-- ARRASTAR
 --========================================================
 
 local arrastando = false
 local inicioMouse
-local inicioPos
+local inicioPainel
 
 Topo.InputBegan:Connect(function(input)
+
 	if input.UserInputType == Enum.UserInputType.MouseButton1
 		or input.UserInputType == Enum.UserInputType.Touch then
 
 		arrastando = true
 		inicioMouse = input.Position
-		inicioPos = Painel.Position
+		inicioPainel = Painel.Position
+	end
+end)
 
-		input.Changed:Connect(function()
-			if input.UserInputState == Enum.UserInputState.End then
-				arrastando = false
-			end
-		end)
+UserInputService.InputEnded:Connect(function(input)
+
+	if input.UserInputType == Enum.UserInputType.MouseButton1
+		or input.UserInputType == Enum.UserInputType.Touch then
+
+		arrastando = false
 	end
 end)
 
 UserInputService.InputChanged:Connect(function(input)
+
 	if not arrastando then
 		return
 	end
@@ -159,14 +168,30 @@ UserInputService.InputChanged:Connect(function(input)
 	if input.UserInputType == Enum.UserInputType.MouseMovement
 		or input.UserInputType == Enum.UserInputType.Touch then
 
-		local delta = input.Position - inicioMouse
+		local movimento = input.Position - inicioMouse
 
-		Painel.Position = UDim2.new(
-			inicioPos.X.Scale,
-			inicioPos.X.Offset + delta.X,
-			inicioPos.Y.Scale,
-			inicioPos.Y.Offset + delta.Y
+		local x = inicioPainel.X.Offset + movimento.X
+		local y = inicioPainel.Y.Offset + movimento.Y
+
+		local tela = Camera.ViewportSize
+
+		local metadeX = Painel.AbsoluteSize.X/2
+		local metadeY = Painel.AbsoluteSize.Y/2
+
+		x = math.clamp(
+			x,
+			-metadeX + 20,
+			tela.X - metadeX - 20
 		)
+
+		y = math.clamp(
+			y,
+			-metadeY + 20,
+			tela.Y - metadeY - 20
+		)
+
+		Painel.Position = UDim2.fromOffset(x,y)
+		Painel.AnchorPoint = Vector2.new(0,0)
 	end
 end)
 
@@ -175,1037 +200,1541 @@ end)
 --========================================================
 
 local Menu = Instance.new("Frame")
-Menu.Name = "Menu"
-Menu.Size = UDim2.new(0, 115, 1, -55)
-Menu.Position = UDim2.new(0, 10, 0, 50)
-Menu.BackgroundColor3 = Color3.fromRGB(29, 29, 33)
+Menu.Size = UDim2.new(0,140,1,-61)
+Menu.Position = UDim2.fromOffset(8,53)
+Menu.BackgroundColor3 = Color3.fromRGB(30,30,30)
 Menu.BorderSizePixel = 0
+Menu.ClipsDescendants = true
 Menu.Parent = Painel
 
-local MenuCanto = Instance.new("UICorner")
-MenuCanto.CornerRadius = UDim.new(0, 7)
-MenuCanto.Parent = Menu
+local mc = Instance.new("UICorner")
+mc.CornerRadius = UDim.new(0,6)
+mc.Parent = Menu
 
-local Conteudo = Instance.new("Frame")
-Conteudo.Name = "Conteudo"
-Conteudo.Size = UDim2.new(1, -135, 1, -55)
-Conteudo.Position = UDim2.new(0, 125, 0, 50)
-Conteudo.BackgroundColor3 = Color3.fromRGB(27, 27, 30)
-Conteudo.BorderSizePixel = 0
-Conteudo.Parent = Painel
+local function CriarMenu(texto,y)
 
-local ConteudoCanto = Instance.new("UICorner")
-ConteudoCanto.CornerRadius = UDim.new(0, 7)
-ConteudoCanto.Parent = Conteudo
+	local b = Instance.new("TextButton")
 
---========================================================
--- FUNÇÃO BOTÃO MENU
---========================================================
+	b.Size = UDim2.new(1,-14,0,38)
+	b.Position = UDim2.fromOffset(7,y)
+	b.BackgroundColor3 = Color3.fromRGB(42,42,42)
+	b.BorderSizePixel = 0
+	b.Text = texto
+	b.TextColor3 = Color3.fromRGB(210,210,210)
+	b.Font = Enum.Font.GothamBold
+	b.TextSize = 13
+	b.Parent = Menu
 
-local function CriarBotaoMenu(nome, texto, ordem)
-	local botao = Instance.new("TextButton")
+	local c = Instance.new("UICorner")
+	c.CornerRadius = UDim.new(0,5)
+	c.Parent = b
 
-	botao.Name = nome
-	botao.Size = UDim2.new(1, -10, 0, 40)
-	botao.Position = UDim2.new(0, 5, 0, 5 + ((ordem - 1) * 45))
-	botao.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
-	botao.BorderSizePixel = 0
-	botao.Text = texto
-	botao.TextColor3 = Color3.fromRGB(235, 235, 235)
-	botao.Font = Enum.Font.GothamBold
-	botao.TextSize = 13
-	botao.Parent = Menu
-
-	local canto = Instance.new("UICorner")
-	canto.CornerRadius = UDim.new(0, 5)
-	canto.Parent = botao
-
-	return botao
+	return b
 end
 
-local BotaoHome = CriarBotaoMenu("Home", "HOME", 1)
-local BotaoTP = CriarBotaoMenu("TPPlayer", "TP PLAYER", 2)
-local BotaoTools = CriarBotaoMenu("Tools", "TOOLS", 3)
-local BotaoConfig = CriarBotaoMenu("Config", "CONFIG", 4)
+local BotaoHome = CriarMenu("Home",8)
+local BotaoTP = CriarMenu("TP Player",52)
+local BotaoTools = CriarMenu("Tools",96)
+local BotaoConfig = CriarMenu("Configurações",140)
+
+local Status = Instance.new("TextLabel")
+Status.Size = UDim2.new(1,-20,0,25)
+Status.Position = UDim2.new(0,10,1,-32)
+Status.BackgroundTransparency = 1
+Status.Text = "JF • Sistema de teste"
+Status.TextColor3 = Color3.fromRGB(120,120,120)
+Status.Font = Enum.Font.Gotham
+Status.TextSize = 11
+Status.TextXAlignment = Enum.TextXAlignment.Left
+Status.Parent = Menu
 
 --========================================================
--- FUNÇÃO LIMPAR CONTEÚDO
+-- ÁREA DIREITA HOME
 --========================================================
 
-local function LimparConteudo()
-	for _, obj in ipairs(Conteudo:GetChildren()) do
-		obj:Destroy()
+local Home = Instance.new("ScrollingFrame")
+Home.Name = "Home"
+Home.Size = UDim2.new(1,-157,1,-61)
+Home.Position = UDim2.fromOffset(149,53)
+Home.BackgroundColor3 = Color3.fromRGB(30,30,30)
+Home.BorderSizePixel = 0
+Home.ScrollBarThickness = 5
+Home.ScrollBarImageColor3 = Color3.fromRGB(150,0,0)
+Home.CanvasSize = UDim2.fromOffset(0,730)
+Home.Parent = Painel
+
+local hc = Instance.new("UICorner")
+hc.CornerRadius = UDim.new(0,6)
+hc.Parent = Home
+
+--========================================================
+-- TELA TP
+--========================================================
+
+local TelaTP = Instance.new("Frame")
+TelaTP.Name = "TPPlayer"
+TelaTP.Size = UDim2.new(1,-157,1,-61)
+TelaTP.Position = UDim2.fromOffset(149,53)
+TelaTP.BackgroundColor3 = Color3.fromRGB(30,30,30)
+TelaTP.BorderSizePixel = 0
+TelaTP.Visible = false
+TelaTP.Parent = Painel
+
+local tpc = Instance.new("UICorner")
+tpc.CornerRadius = UDim.new(0,6)
+tpc.Parent = TelaTP
+
+--========================================================
+-- TÍTULO TP
+--========================================================
+
+local TituloTP = Instance.new("TextLabel")
+TituloTP.Size = UDim2.new(1,-24,0,32)
+TituloTP.Position = UDim2.fromOffset(12,7)
+TituloTP.BackgroundTransparency = 1
+TituloTP.Text = "TP PLAYER"
+TituloTP.TextColor3 = Color3.fromRGB(255,255,255)
+TituloTP.Font = Enum.Font.GothamBold
+TituloTP.TextSize = 18
+TituloTP.TextXAlignment = Enum.TextXAlignment.Left
+TituloTP.Parent = TelaTP
+
+--========================================================
+-- PESQUISA
+--========================================================
+
+local Pesquisa = Instance.new("TextBox")
+Pesquisa.Size = UDim2.new(1,-24,0,38)
+Pesquisa.Position = UDim2.fromOffset(12,45)
+Pesquisa.BackgroundColor3 = Color3.fromRGB(42,42,42)
+Pesquisa.BorderSizePixel = 0
+Pesquisa.Text = ""
+Pesquisa.PlaceholderText = "Pesquisar jogador..."
+Pesquisa.PlaceholderColor3 = Color3.fromRGB(130,130,130)
+Pesquisa.TextColor3 = Color3.fromRGB(235,235,235)
+Pesquisa.Font = Enum.Font.Gotham
+Pesquisa.TextSize = 13
+Pesquisa.ClearTextOnFocus = false
+Pesquisa.Parent = TelaTP
+
+local pq = Instance.new("UICorner")
+pq.CornerRadius = UDim.new(0,6)
+pq.Parent = Pesquisa
+
+--========================================================
+-- LISTA
+--========================================================
+
+local Lista = Instance.new("ScrollingFrame")
+Lista.Size = UDim2.new(1,-24,1,-94)
+Lista.Position = UDim2.fromOffset(12,90)
+Lista.BackgroundTransparency = 1
+Lista.BorderSizePixel = 0
+Lista.ScrollBarThickness = 5
+Lista.ScrollBarImageColor3 = Color3.fromRGB(150,0,0)
+Lista.CanvasSize = UDim2.fromOffset(0,0)
+Lista.Parent = TelaTP
+
+local Layout = Instance.new("UIListLayout")
+Layout.Padding = UDim.new(0,6)
+Layout.SortOrder = Enum.SortOrder.Name
+Layout.Parent = Lista
+
+--========================================================
+-- TELEPORTAR
+--========================================================
+
+local function TeleportarParaPlayer(alvo)
+
+	if not alvo then
+		return
+	end
+
+	if alvo == LocalPlayer then
+		return
+	end
+
+	local meuChar = LocalPlayer.Character
+	local alvoChar = alvo.Character
+
+	if not meuChar or not alvoChar then
+		return
+	end
+
+	local minhaRaiz = meuChar:FindFirstChild("HumanoidRootPart")
+	local raizAlvo = alvoChar:FindFirstChild("HumanoidRootPart")
+
+	if minhaRaiz and raizAlvo then
+
+		minhaRaiz.CFrame =
+			raizAlvo.CFrame *
+			CFrame.new(0,0,3)
 	end
 end
 
 --========================================================
--- CRIAR TOGGLE
+-- ATUALIZAR JOGADORES
 --========================================================
-
-local function CriarToggle(texto, estado, callback, y)
-	local botao = Instance.new("TextButton")
-
-	botao.Size = UDim2.new(1, -20, 0, 40)
-	botao.Position = UDim2.new(0, 10, 0, y)
-	botao.BackgroundColor3 = estado and Color3.fromRGB(35, 130, 70) or Color3.fromRGB(45, 45, 50)
-	botao.BorderSizePixel = 0
-	botao.TextColor3 = Color3.fromRGB(255, 255, 255)
-	botao.Font = Enum.Font.GothamBold
-	botao.TextSize = 13
-	botao.Text = texto .. ": " .. (estado and "ATIVADO" or "DESATIVADO")
-	botao.Parent = Conteudo
-
-	local canto = Instance.new("UICorner")
-	canto.CornerRadius = UDim.new(0, 5)
-	canto.Parent = botao
-
-	botao.MouseButton1Click:Connect(function()
-		estado = not estado
-
-		botao.BackgroundColor3 = estado
-			and Color3.fromRGB(35, 130, 70)
-			or Color3.fromRGB(45, 45, 50)
-
-		botao.Text = texto .. ": " .. (estado and "ATIVADO" or "DESATIVADO")
-
-		callback(estado)
-	end)
-
-	return botao
-end
-
---========================================================
--- HOME
---========================================================
-
-local function AbrirHome()
-	LimparConteudo()
-
-	local titulo = Instance.new("TextLabel")
-	titulo.Size = UDim2.new(1, -20, 0, 35)
-	titulo.Position = UDim2.new(0, 10, 0, 10)
-	titulo.BackgroundTransparency = 1
-	titulo.Text = "CONTROLE DO PAINEL"
-	titulo.TextColor3 = Color3.fromRGB(255, 255, 255)
-	titulo.Font = Enum.Font.GothamBold
-	titulo.TextSize = 17
-	titulo.TextXAlignment = Enum.TextXAlignment.Left
-	titulo.Parent = Conteudo
-
-	CriarToggle("ESP", ESP_ATIVADO, function(valor)
-		ESP_ATIVADO = valor
-	end, 55)
-
-	CriarToggle("FOV", FOV_ATIVADO, function(valor)
-		FOV_ATIVADO = valor
-	end, 100)
-
-	CriarToggle("BARRA DE VIDA", BARRA_VIDA_ATIVADA, function(valor)
-		BARRA_VIDA_ATIVADA = valor
-	end, 145)
-
-	CriarToggle("VIDA INFINITA", VIDA_INFINITA, function(valor)
-		VIDA_INFINITA = valor
-	end, 190)
-end
-
---========================================================
--- TP PLAYER
---========================================================
-
-local CaixaBuscaPlayer = nil
-local ListaPlayers = nil
 
 local function AtualizarPlayers()
-	if not ListaPlayers then
-		return
-	end
 
-	for _, obj in ipairs(ListaPlayers:GetChildren()) do
-		if obj:IsA("TextButton") then
+	for _,obj in ipairs(Lista:GetChildren()) do
+
+		if obj:IsA("Frame") then
 			obj:Destroy()
 		end
 	end
 
-	local texto = CaixaBuscaPlayer and CaixaBuscaPlayer.Text:lower() or ""
+	local busca = string.lower(Pesquisa.Text)
+	local quantidade = 0
 
-	local y = 0
+	for _,player in ipairs(Players:GetPlayers()) do
 
-	for _, alvo in ipairs(Players:GetPlayers()) do
-		if alvo ~= Player then
-			if texto == "" or alvo.Name:lower():find(texto, 1, true) then
+		if player ~= LocalPlayer then
 
-				local botao = Instance.new("TextButton")
-				botao.Size = UDim2.new(1, -5, 0, 35)
-				botao.Position = UDim2.new(0, 0, 0, y)
-				botao.BackgroundColor3 = Color3.fromRGB(42, 42, 47)
-				botao.BorderSizePixel = 0
-				botao.Text = alvo.Name
-				botao.TextColor3 = Color3.fromRGB(255, 255, 255)
-				botao.Font = Enum.Font.Gotham
-				botao.TextSize = 13
-				botao.Parent = ListaPlayers
+			local nome = string.lower(player.Name)
+			local display = string.lower(player.DisplayName)
 
-				local canto = Instance.new("UICorner")
-				canto.CornerRadius = UDim.new(0, 5)
-				canto.Parent = botao
+			if busca == ""
+				or string.find(nome,busca,1,true)
+				or string.find(display,busca,1,true) then
 
-				botao.MouseButton1Click:Connect(function()
-					if alvo.Character
-						and alvo.Character:FindFirstChild("HumanoidRootPart")
-						and Player.Character
-						and Player.Character:FindFirstChild("HumanoidRootPart") then
+				quantidade += 1
 
-						Player.Character.HumanoidRootPart.CFrame =
-							alvo.Character.HumanoidRootPart.CFrame
-					end
+				local Linha = Instance.new("Frame")
+				Linha.Size = UDim2.new(1,-5,0,48)
+				Linha.BackgroundColor3 = Color3.fromRGB(42,42,42)
+				Linha.BorderSizePixel = 0
+				Linha.Parent = Lista
+
+				local lc = Instance.new("UICorner")
+				lc.CornerRadius = UDim.new(0,6)
+				lc.Parent = Linha
+
+				local Nome = Instance.new("TextLabel")
+				Nome.Size = UDim2.new(1,-75,1,0)
+				Nome.Position = UDim2.fromOffset(10,0)
+				Nome.BackgroundTransparency = 1
+				Nome.Text = "👤  "..player.DisplayName.."  @"..player.Name
+				Nome.TextColor3 = Color3.fromRGB(235,235,235)
+				Nome.Font = Enum.Font.GothamBold
+				Nome.TextSize = 11
+				Nome.TextXAlignment = Enum.TextXAlignment.Left
+				Nome.TextTruncate = Enum.TextTruncate.AtEnd
+				Nome.Parent = Linha
+
+				local TP = Instance.new("TextButton")
+				TP.Size = UDim2.fromOffset(52,32)
+				TP.Position = UDim2.new(1,-60,0.5,-16)
+				TP.BackgroundColor3 = Color3.fromRGB(120,0,0)
+				TP.BorderSizePixel = 0
+				TP.Text = "TP"
+				TP.TextColor3 = Color3.fromRGB(255,255,255)
+				TP.Font = Enum.Font.GothamBold
+				TP.TextSize = 12
+				TP.Parent = Linha
+
+				local tpc2 = Instance.new("UICorner")
+				tpc2.CornerRadius = UDim.new(0,5)
+				tpc2.Parent = TP
+
+				TP.MouseButton1Click:Connect(function()
+					TeleportarParaPlayer(player)
 				end)
-
-				y += 40
 			end
 		end
 	end
 
-	ListaPlayers.CanvasSize = UDim2.new(0, 0, 0, y)
+	Lista.CanvasSize =
+		UDim2.fromOffset(0,math.max(0,quantidade * 54))
 end
 
-local function AbrirTP()
-	LimparConteudo()
-
-	local titulo = Instance.new("TextLabel")
-	titulo.Size = UDim2.new(1, -20, 0, 30)
-	titulo.Position = UDim2.new(0, 10, 0, 8)
-	titulo.BackgroundTransparency = 1
-	titulo.Text = "TELEPORTAR PARA PLAYER"
-	titulo.TextColor3 = Color3.fromRGB(255, 255, 255)
-	titulo.Font = Enum.Font.GothamBold
-	titulo.TextSize = 16
-	titulo.TextXAlignment = Enum.TextXAlignment.Left
-	titulo.Parent = Conteudo
-
-	CaixaBuscaPlayer = Instance.new("TextBox")
-	CaixaBuscaPlayer.Size = UDim2.new(1, -20, 0, 35)
-	CaixaBuscaPlayer.Position = UDim2.new(0, 10, 0, 42)
-	CaixaBuscaPlayer.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
-	CaixaBuscaPlayer.BorderSizePixel = 0
-	CaixaBuscaPlayer.PlaceholderText = "Pesquisar player..."
-	CaixaBuscaPlayer.Text = ""
-	CaixaBuscaPlayer.TextColor3 = Color3.fromRGB(255, 255, 255)
-	CaixaBuscaPlayer.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
-	CaixaBuscaPlayer.Font = Enum.Font.Gotham
-	CaixaBuscaPlayer.TextSize = 13
-	CaixaBuscaPlayer.Parent = Conteudo
-
-	local cantoBusca = Instance.new("UICorner")
-	cantoBusca.CornerRadius = UDim.new(0, 5)
-	cantoBusca.Parent = CaixaBuscaPlayer
-
-	ListaPlayers = Instance.new("ScrollingFrame")
-	ListaPlayers.Size = UDim2.new(1, -20, 1, -90)
-	ListaPlayers.Position = UDim2.new(0, 10, 0, 85)
-	ListaPlayers.BackgroundTransparency = 1
-	ListaPlayers.BorderSizePixel = 0
-	ListaPlayers.ScrollBarThickness = 5
-	ListaPlayers.CanvasSize = UDim2.new(0, 0, 0, 0)
-	ListaPlayers.Parent = Conteudo
-
-	CaixaBuscaPlayer:GetPropertyChangedSignal("Text"):Connect(AtualizarPlayers)
-
+Pesquisa:GetPropertyChangedSignal("Text"):Connect(function()
 	AtualizarPlayers()
-end
+end)
+
+Players.PlayerAdded:Connect(function()
+	task.wait()
+	AtualizarPlayers()
+end)
+
+Players.PlayerRemoving:Connect(function()
+	task.wait()
+	AtualizarPlayers()
+end)
 
 --========================================================
--- TOOLS
+-- HOME - TÍTULO
 --========================================================
 
-local CaixaBuscaTool
-local ListaTools
-local InfoTools
+local TituloHome = Instance.new("TextLabel")
+TituloHome.Size = UDim2.new(1,-24,0,35)
+TituloHome.Position = UDim2.fromOffset(12,8)
+TituloHome.BackgroundTransparency = 1
+TituloHome.Text = "Home"
+TituloHome.TextColor3 = Color3.fromRGB(255,255,255)
+TituloHome.Font = Enum.Font.GothamBold
+TituloHome.TextSize = 18
+TituloHome.TextXAlignment = Enum.TextXAlignment.Left
+TituloHome.Parent = Home
 
 --========================================================
--- UTILITÁRIOS DAS TOOLS
+-- FUNÇÃO OPÇÃO
 --========================================================
 
-local function CaminhoSeguro(obj)
-	local caminho = {}
+local function CriarOpcao(texto,y)
 
-	local atual = obj
-
-	while atual and atual ~= game do
-		table.insert(caminho, 1, atual.Name)
-		atual = atual.Parent
-	end
-
-	return table.concat(caminho, " > ")
-end
-
-local function NormalizarNome(texto)
-	texto = tostring(texto or "")
-	texto = texto:lower()
-
-	texto = texto:gsub("[%s%p_]+", "")
-
-	return texto
-end
-
-local function DistanciaTexto(a, b)
-	a = NormalizarNome(a)
-	b = NormalizarNome(b)
-
-	if a == b then
-		return 0
-	end
-
-	if a:find(b, 1, true) then
-		return 1
-	end
-
-	if b:find(a, 1, true) then
-		return 1
-	end
-
-	local maior = math.max(#a, #b)
-
-	if maior == 0 then
-		return 0
-	end
-
-	local iguais = 0
-
-	for i = 1, math.min(#a, #b) do
-		if a:sub(i, i) == b:sub(i, i) then
-			iguais += 1
-		end
-	end
-
-	return maior - iguais
-end
-
-local function PontuacaoNome(nome, alvo)
-	local nomeN = NormalizarNome(nome)
-	local alvoN = NormalizarNome(alvo)
-
-	if nomeN == alvoN then
-		return 10000
-	end
-
-	if nomeN:find(alvoN, 1, true) then
-		return 8000 - math.abs(#nomeN - #alvoN)
-	end
-
-	if alvoN:find(nomeN, 1, true) then
-		return 7000 - math.abs(#nomeN - #alvoN)
-	end
-
-	local distancia = DistanciaTexto(nomeN, alvoN)
-
-	return math.max(0, 5000 - distancia * 100)
-end
-
-local function DescobrirOrigem(tool)
-	if not tool or not tool.Parent then
-		return "Desconhecido"
-	end
-
-	if Player.Backpack
-		and tool:IsDescendantOf(Player.Backpack) then
-		return "Backpack"
-	end
-
-	if Player.Character
-		and tool:IsDescendantOf(Player.Character) then
-		return "Personagem"
-	end
-
-	if tool:IsDescendantOf(workspace) then
-		return "Workspace"
-	end
-
-	if tool:IsDescendantOf(ReplicatedStorage) then
-		return "ReplicatedStorage"
-	end
-
-	return CaminhoSeguro(tool)
-end
-
-local function ColetarTools()
-	local resultado = {}
-	local vistos = {}
-
-	for _, obj in ipairs(game:GetDescendants()) do
-		if obj:IsA("Tool") then
-			if not vistos[obj] then
-				vistos[obj] = true
-
-				table.insert(resultado, {
-					Tool = obj,
-					Name = obj.Name,
-					Origem = DescobrirOrigem(obj),
-					Caminho = CaminhoSeguro(obj)
-				})
-			end
-		end
-	end
-
-	return resultado
-end
-
-local function LocalizarMelhorTool(nome)
-	local alvo = NormalizarNome(nome)
-
-	if alvo == "" then
-		return nil
-	end
-
-	local melhor = nil
-	local melhorPontuacao = -math.huge
-
-	for _, info in ipairs(ColetarTools()) do
-		local pontuacao = PontuacaoNome(info.Name, alvo)
-
-		if pontuacao > melhorPontuacao then
-			melhorPontuacao = pontuacao
-			melhor = info.Tool
-		end
-	end
-
-	return melhor
-end
-
-local function LocalizarToolsParecidas(nome)
-	local lista = {}
-	local alvo = NormalizarNome(nome)
-
-	if alvo == "" then
-		return lista
-	end
-
-	for _, info in ipairs(ColetarTools()) do
-		local pontuacao = PontuacaoNome(info.Name, alvo)
-
-		if pontuacao >= 1000 then
-			table.insert(lista, {
-				Tool = info.Tool,
-				Name = info.Name,
-				Origem = info.Origem,
-				Caminho = info.Caminho,
-				Pontuacao = pontuacao
-			})
-		end
-	end
-
-	table.sort(lista, function(a, b)
-		return a.Pontuacao > b.Pontuacao
-	end)
-
-	return lista
-end
-
-local function LimparListaTools()
-	if not ListaTools then
-		return
-	end
-
-	for _, obj in ipairs(ListaTools:GetChildren()) do
-		if obj:IsA("TextButton") or obj:IsA("Frame") then
-			obj:Destroy()
-		end
-	end
-end
-
-local function ResetarBotao(botao)
-	if botao and botao.Parent then
-		botao.BackgroundColor3 = Color3.fromRGB(42, 42, 47)
-	end
-end
-
-local function JaPossuiTool(nome)
-	local backpack = Player:FindFirstChildOfClass("Backpack")
-
-	if backpack and backpack:FindFirstChild(nome) then
-		return true
-	end
-
-	if Player.Character and Player.Character:FindFirstChild(nome) then
-		return true
-	end
-
-	return false
-end
-
-local function ColocarNoInventario(tool)
-	if not tool then
-		return false
-	end
-
-	local backpack = Player:FindFirstChildOfClass("Backpack")
-
-	if not backpack then
-		return false
-	end
-
-	if JaPossuiTool(tool.Name) then
-		return true
-	end
-
-	local sucesso, clone = pcall(function()
-		return tool:Clone()
-	end)
-
-	if not sucesso or not clone then
-		return false
-	end
-
-	clone.Parent = backpack
-
-	return true
-end
-
-local function CriarItemTool(info, y)
 	local botao = Instance.new("TextButton")
 
-	botao.Name = "Tool_" .. tostring(y)
-	botao.Size = UDim2.new(1, -5, 0, 48)
-	botao.Position = UDim2.new(0, 0, 0, y)
-	botao.BackgroundColor3 = Color3.fromRGB(42, 42, 47)
+	botao.Size = UDim2.new(1,-24,0,48)
+	botao.Position = UDim2.fromOffset(12,y)
+	botao.BackgroundColor3 = Color3.fromRGB(42,42,42)
 	botao.BorderSizePixel = 0
 	botao.Text = ""
-	botao.Parent = ListaTools
+	botao.Parent = Home
 
-	local canto = Instance.new("UICorner")
-	canto.CornerRadius = UDim.new(0, 5)
-	canto.Parent = botao
+	local c = Instance.new("UICorner")
+	c.CornerRadius = UDim.new(0,6)
+	c.Parent = botao
 
-	local nome = Instance.new("TextLabel")
-	nome.Size = UDim2.new(1, -110, 0, 22)
-	nome.Position = UDim2.new(0, 8, 0, 3)
-	nome.BackgroundTransparency = 1
-	nome.Text = info.Name
-	nome.TextColor3 = Color3.fromRGB(255, 255, 255)
-	nome.Font = Enum.Font.GothamBold
-	nome.TextSize = 13
-	nome.TextXAlignment = Enum.TextXAlignment.Left
-	nome.TextTruncate = Enum.TextTruncate.AtEnd
-	nome.Parent = botao
+	local txt = Instance.new("TextLabel")
+	txt.Size = UDim2.new(1,-65,1,0)
+	txt.Position = UDim2.fromOffset(12,0)
+	txt.BackgroundTransparency = 1
+	txt.Text = texto
+	txt.TextColor3 = Color3.fromRGB(235,235,235)
+	txt.Font = Enum.Font.GothamBold
+	txt.TextSize = 13
+	txt.TextXAlignment = Enum.TextXAlignment.Left
+	txt.Parent = botao
 
-	local origem = Instance.new("TextLabel")
-	origem.Size = UDim2.new(1, -110, 0, 18)
-	origem.Position = UDim2.new(0, 8, 0, 25)
-	origem.BackgroundTransparency = 1
-	origem.Text = info.Origem
-	origem.TextColor3 = Color3.fromRGB(155, 155, 155)
-	origem.Font = Enum.Font.Gotham
-	origem.TextSize = 10
-	origem.TextXAlignment = Enum.TextXAlignment.Left
-	origem.TextTruncate = Enum.TextTruncate.AtEnd
-	origem.Parent = botao
+	local toggle = Instance.new("Frame")
+	toggle.Size = UDim2.fromOffset(30,17)
+	toggle.Position = UDim2.new(1,-42,0.5,-8)
+	toggle.BackgroundColor3 = Color3.fromRGB(15,15,15)
+	toggle.BorderSizePixel = 0
+	toggle.Parent = botao
 
-	local pegar = Instance.new("TextButton")
-	pegar.Size = UDim2.new(0, 80, 0, 30)
-	pegar.Position = UDim2.new(1, -88, 0.5, -15)
-	pegar.BackgroundColor3 = Color3.fromRGB(35, 115, 65)
-	pegar.BorderSizePixel = 0
-	pegar.Text = "PEGAR"
-	pegar.TextColor3 = Color3.fromRGB(255, 255, 255)
-	pegar.Font = Enum.Font.GothamBold
-	pegar.TextSize = 11
-	pegar.Parent = botao
+	local tc = Instance.new("UICorner")
+	tc.CornerRadius = UDim.new(1,0)
+	tc.Parent = toggle
 
-	local cantoPegar = Instance.new("UICorner")
-	cantoPegar.CornerRadius = UDim.new(0, 5)
-	cantoPegar.Parent = pegar
+	local bola = Instance.new("Frame")
+	bola.Size = UDim2.fromOffset(11,11)
+	bola.Position = UDim2.fromOffset(3,3)
+	bola.BackgroundColor3 = Color3.fromRGB(80,80,80)
+	bola.BorderSizePixel = 0
+	bola.Parent = toggle
 
-	pegar.MouseButton1Click:Connect(function()
-		local sucesso = ColocarNoInventario(info.Tool)
+	local bc = Instance.new("UICorner")
+	bc.CornerRadius = UDim.new(1,0)
+	bc.Parent = bola
 
-		if sucesso then
-			pegar.Text = "OK"
-			pegar.BackgroundColor3 = Color3.fromRGB(40, 150, 75)
-
-			task.delay(1, function()
-				if pegar and pegar.Parent then
-					pegar.Text = "PEGAR"
-					pegar.BackgroundColor3 = Color3.fromRGB(35, 115, 65)
-				end
-			end)
-		else
-			pegar.Text = "ERRO"
-
-			task.delay(1, function()
-				if pegar and pegar.Parent then
-					pegar.Text = "PEGAR"
-				end
-			end)
-		end
-	end)
-
-	return botao
+	return botao,toggle,bola
 end
 
---========================================================
--- MOSTRAR TOOLS
---========================================================
+local function Alternar(toggle,bola,ligado)
 
-local function MostrarTools(lista)
-	LimparListaTools()
+	if ligado then
 
-	if not ListaTools then
-		return
+		toggle.BackgroundColor3 =
+			Color3.fromRGB(100,0,0)
+
+		bola.BackgroundColor3 =
+			Color3.fromRGB(255,0,0)
+
+		bola.Position =
+			UDim2.new(1,-14,0,3)
+
+	else
+
+		toggle.BackgroundColor3 =
+			Color3.fromRGB(15,15,15)
+
+		bola.BackgroundColor3 =
+			Color3.fromRGB(80,80,80)
+
+		bola.Position =
+			UDim2.fromOffset(3,3)
 	end
-
-	local alvo = CaixaBuscaTool and NormalizarNome(CaixaBuscaTool.Text) or ""
-
-	table.sort(lista, function(a, b)
-		if alvo ~= "" then
-			local pa = PontuacaoNome(a.Name, alvo)
-			local pb = PontuacaoNome(b.Name, alvo)
-
-			if pa ~= pb then
-				return pa > pb
-			end
-		end
-
-		return a.Name:lower() < b.Name:lower()
-	end)
-
-	local y = 0
-
-	for _, info in ipairs(lista) do
-		CriarItemTool(info, y)
-
-		y += 53
-	end
-
-	ListaTools.CanvasSize = UDim2.new(0, 0, 0, y)
-end
-
---========================================================
--- CARREGAR TOOLS
---========================================================
-
-local function CarregarTools()
-	if not ListaTools then
-		return
-	end
-
-	local tools = ColetarTools()
-
-	-- Procura especificamente pela ArmaPDSecreta
-	local encontrouArma = false
-
-	for _, info in ipairs(tools) do
-		if NormalizarNome(info.Name) == NormalizarNome("ArmaPDSecreta") then
-			encontrouArma = true
-			break
-		end
-	end
-
-	-- Se não encontrou exatamente, adiciona parecidas
-	if not encontrouArma then
-		local parecidas = LocalizarToolsParecidas("ArmaPDSecreta")
-
-		for _, info in ipairs(parecidas) do
-			if NormalizarNome(info.Name) == NormalizarNome("ArmaPDSecreta") then
-				encontrouArma = true
-				break
-			end
-		end
-	end
-
-	MostrarTools(tools)
-end
-
---========================================================
--- PROCURAR TOOL
---========================================================
-
-local function ProcurarPorNome(nome)
-	nome = nome or "ArmaPDSecreta"
-
-	local texto = NormalizarNome(nome)
-
-	if texto == "" then
-		CarregarTools()
-		return
-	end
-
-	local resultados = LocalizarToolsParecidas(nome)
-
-	-- Busca exata primeiro
-	local exatas = {}
-
-	for _, info in ipairs(ColetarTools()) do
-		if NormalizarNome(info.Name) == texto then
-			table.insert(exatas, {
-				Tool = info.Tool,
-				Name = info.Name,
-				Origem = info.Origem,
-				Caminho = info.Caminho,
-				Pontuacao = 100000
-			})
-		end
-	end
-
-	for _, info in ipairs(resultados) do
-		local jaExiste = false
-
-		for _, exata in ipairs(exatas) do
-			if exata.Tool == info.Tool then
-				jaExiste = true
-				break
-			end
-		end
-
-		if not jaExiste then
-			table.insert(exatas, info)
-		end
-	end
-
-	MostrarTools(exatas)
-end
-
---========================================================
--- TELA TOOLS
---========================================================
-
-local function AbrirTools()
-	LimparConteudo()
-
-	local titulo = Instance.new("TextLabel")
-	titulo.Size = UDim2.new(1, -20, 0, 30)
-	titulo.Position = UDim2.new(0, 10, 0, 8)
-	titulo.BackgroundTransparency = 1
-	titulo.Text = "TOOLS DO SERVIDOR"
-	titulo.TextColor3 = Color3.fromRGB(255, 255, 255)
-	titulo.Font = Enum.Font.GothamBold
-	titulo.TextSize = 16
-	titulo.TextXAlignment = Enum.TextXAlignment.Left
-	titulo.Parent = Conteudo
-
-	CaixaBuscaTool = Instance.new("TextBox")
-	CaixaBuscaTool.Name = "BuscaTools"
-	CaixaBuscaTool.Size = UDim2.new(1, -142, 0, 35)
-	CaixaBuscaTool.Position = UDim2.new(0, 10, 0, 42)
-	CaixaBuscaTool.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
-	CaixaBuscaTool.BorderSizePixel = 0
-	CaixaBuscaTool.PlaceholderText = "Pesquisar Tool..."
-	CaixaBuscaTool.Text = ""
-	CaixaBuscaTool.TextColor3 = Color3.fromRGB(255, 255, 255)
-	CaixaBuscaTool.PlaceholderColor3 = Color3.fromRGB(150, 150, 150)
-	CaixaBuscaTool.Font = Enum.Font.Gotham
-	CaixaBuscaTool.TextSize = 12
-	CaixaBuscaTool.ClearTextOnFocus = false
-	CaixaBuscaTool.Parent = Conteudo
-
-	local cantoBusca = Instance.new("UICorner")
-	cantoBusca.CornerRadius = UDim.new(0, 5)
-	cantoBusca.Parent = CaixaBuscaTool
-
-	local BuscarTool = Instance.new("TextButton")
-	BuscarTool.Name = "Procurar"
-	BuscarTool.Size = UDim2.new(0, 60, 0, 35)
-	BuscarTool.Position = UDim2.new(1, -125, 0, 42)
-	BuscarTool.BackgroundColor3 = Color3.fromRGB(40, 110, 170)
-	BuscarTool.BorderSizePixel = 0
-	BuscarTool.Text = "BUSCAR"
-	BuscarTool.TextColor3 = Color3.fromRGB(255, 255, 255)
-	BuscarTool.Font = Enum.Font.GothamBold
-	BuscarTool.TextSize = 9
-	BuscarTool.Parent = Conteudo
-
-	local cantoBuscar = Instance.new("UICorner")
-	cantoBuscar.CornerRadius = UDim.new(0, 5)
-	cantoBuscar.Parent = BuscarTool
-
-	local AtualizarTools = Instance.new("TextButton")
-	AtualizarTools.Name = "Atualizar"
-	AtualizarTools.Size = UDim2.new(0, 60, 0, 35)
-	AtualizarTools.Position = UDim2.new(1, -60, 0, 42)
-	AtualizarTools.BackgroundColor3 = Color3.fromRGB(45, 130, 75)
-	AtualizarTools.BorderSizePixel = 0
-	AtualizarTools.Text = "ATUALIZAR"
-	AtualizarTools.TextColor3 = Color3.fromRGB(255, 255, 255)
-	AtualizarTools.Font = Enum.Font.GothamBold
-	AtualizarTools.TextSize = 8
-	AtualizarTools.Parent = Conteudo
-
-	local cantoAtualizar = Instance.new("UICorner")
-	cantoAtualizar.CornerRadius = UDim.new(0, 5)
-	cantoAtualizar.Parent = AtualizarTools
-
-	InfoTools = Instance.new("TextLabel")
-	InfoTools.Size = UDim2.new(1, -20, 0, 25)
-	InfoTools.Position = UDim2.new(0, 10, 0, 80)
-	InfoTools.BackgroundTransparency = 1
-	InfoTools.Text = "Digite o nome da Tool ou procure por ArmaPDSecreta."
-	InfoTools.TextColor3 = Color3.fromRGB(150, 150, 150)
-	InfoTools.Font = Enum.Font.Gotham
-	InfoTools.TextSize = 10
-	InfoTools.TextXAlignment = Enum.TextXAlignment.Left
-	InfoTools.Parent = Conteudo
-
-	ListaTools = Instance.new("ScrollingFrame")
-	ListaTools.Name = "ListaTools"
-	ListaTools.Size = UDim2.new(1, -20, 1, -115)
-	ListaTools.Position = UDim2.new(0, 10, 0, 108)
-	ListaTools.BackgroundTransparency = 1
-	ListaTools.BorderSizePixel = 0
-	ListaTools.ScrollBarThickness = 5
-	ListaTools.CanvasSize = UDim2.new(0, 0, 0, 0)
-	ListaTools.Parent = Conteudo
-
-	BuscarTool.MouseButton1Click:Connect(function()
-		ProcurarPorNome(CaixaBuscaTool.Text)
-	end)
-
-	AtualizarTools.MouseButton1Click:Connect(function()
-		CarregarTools()
-	end)
-
-	CaixaBuscaTool.FocusLost:Connect(function(enterPressed)
-		if enterPressed then
-			ProcurarPorNome(CaixaBuscaTool.Text)
-		end
-	end)
-
-	CarregarTools()
-end
-
---========================================================
--- FOV
---========================================================
-
-local FOVCircle = Instance.new("Frame")
-FOVCircle.Name = "FOVCircle"
-FOVCircle.AnchorPoint = Vector2.new(0.5, 0.5)
-FOVCircle.Position = UDim2.new(0.5, 0, 0.5, 0)
-FOVCircle.Size = UDim2.new(0, TAMANHO_FOV * 2, 0, TAMANHO_FOV * 2)
-FOVCircle.BackgroundTransparency = 1
-FOVCircle.BorderSizePixel = 0
-FOVCircle.Visible = false
-FOVCircle.ZIndex = 50
-FOVCircle.Parent = ScreenGui
-
-local FOVStroke = Instance.new("UIStroke")
-FOVStroke.Thickness = 1
-FOVStroke.Color = Color3.fromRGB(255, 255, 255)
-FOVStroke.Parent = FOVCircle
-
-local FOVCorner = Instance.new("UICorner")
-FOVCorner.CornerRadius = UDim.new(1, 0)
-FOVCorner.Parent = FOVCircle
-
---========================================================
--- MIRA
---========================================================
-
-local function PegarParte(character)
-	if not character then
-		return nil
-	end
-
-	if PARTE_MIRA == "Cabeça" then
-		return character:FindFirstChild("Head")
-	end
-
-	if PARTE_MIRA == "Torso" then
-		return character:FindFirstChild("UpperTorso")
-			or character:FindFirstChild("Torso")
-	end
-
-	if PARTE_MIRA == "HumanoidRootPart" then
-		return character:FindFirstChild("HumanoidRootPart")
-	end
-
-	return character:FindFirstChild("Head")
-end
-
-local function PegarAlvo()
-	if not Camera then
-		return nil
-	end
-
-	local centro = Vector2.new(
-		Camera.ViewportSize.X / 2,
-		Camera.ViewportSize.Y / 2
-	)
-
-	local melhor = nil
-	local menorDistancia = TAMANHO_FOV
-
-	for _, alvo in ipairs(Players:GetPlayers()) do
-		if alvo ~= Player and alvo.Character then
-
-			local humanoid = alvo.Character:FindFirstChildOfClass("Humanoid")
-			local parte = PegarParte(alvo.Character)
-
-			if humanoid and humanoid.Health > 0 and parte then
-
-				local pos, visivel = Camera:WorldToViewportPoint(parte.Position)
-
-				if visivel and pos.Z > 0 then
-					local distancia = (
-						Vector2.new(pos.X, pos.Y) - centro
-					).Magnitude
-
-					if distancia < menorDistancia then
-						menorDistancia = distancia
-						melhor = parte
-					end
-				end
-			end
-		end
-	end
-
-	return melhor
 end
 
 --========================================================
 -- ESP
 --========================================================
 
-local function RemoverESP(character)
-	if not character then
-		return
-	end
+local BotaoESP,ToggleESP,BolaESP =
+	CriarOpcao("ESP • Caixa",50)
 
-	local esp = character:FindFirstChild("JF_ESP")
+BotaoESP.MouseButton1Click:Connect(function()
 
-	if esp then
-		esp:Destroy()
-	end
-end
+	ESP_ATIVADO = not ESP_ATIVADO
 
-local function CriarESP(character)
-	if not character then
-		return
-	end
+	Alternar(
+		ToggleESP,
+		BolaESP,
+		ESP_ATIVADO
+	)
+end)
 
-	if character == Player.Character then
-		return
-	end
+--========================================================
+-- FOV
+--========================================================
 
-	local humanoid = character:FindFirstChildOfClass("Humanoid")
+local BotaoFOV,ToggleFOV,BolaFOV =
+	CriarOpcao("FOV",106)
 
-	if not humanoid then
-		return
-	end
+BotaoFOV.MouseButton1Click:Connect(function()
 
-	local antigoESP = character:FindFirstChild("JF_ESP")
+	FOV_ATIVADO = not FOV_ATIVADO
 
-	if antigoESP then
-		antigoESP:Destroy()
-	end
-
-	local highlight = Instance.new("Highlight")
-	highlight.Name = "JF_ESP"
-	highlight.FillTransparency = 1
-	highlight.OutlineTransparency = 0
-	highlight.OutlineColor = Color3.fromRGB(255, 0, 0)
-	highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-	highlight.Parent = character
-end
-
-local function AtualizarESP()
-	for _, alvo in ipairs(Players:GetPlayers()) do
-		if alvo ~= Player and alvo.Character then
-			if ESP_ATIVADO then
-				CriarESP(alvo.Character)
-			else
-				RemoverESP(alvo.Character)
-			end
-		end
-	end
-end
+	Alternar(
+		ToggleFOV,
+		BolaFOV,
+		FOV_ATIVADO
+	)
+end)
 
 --========================================================
 -- BARRA DE VIDA
 --========================================================
 
-local function AtualizarBarraVida()
-	for _, alvo in ipairs(Players:GetPlayers()) do
-		if alvo ~= Player and alvo.Character then
+local BotaoBarraVida,ToggleBarraVida,BolaBarraVida =
+	CriarOpcao("Barra de Vida",162)
 
-			local character = alvo.Character
-			local humanoid = character:FindFirstChildOfClass("Humanoid")
+BotaoBarraVida.MouseButton1Click:Connect(function()
 
-			if humanoid then
+	BARRA_VIDA_ATIVADA = not BARRA_VIDA_ATIVADA
 
-				local antigo = character:FindFirstChild("JF_Vida")
+	Alternar(
+		ToggleBarraVida,
+		BolaBarraVida,
+		BARRA_VIDA_ATIVADA
+	)
+end)
 
-				if not BARRA_VIDA_ATIVADA then
-					if antigo then
-						antigo:Destroy()
-					end
-				else
+--========================================================
+-- TELA TOOLS - LOCAL SCRIPT ÚNICO
+--========================================================
 
-					local gui = antigo
+local TelaTools = Instance.new("Frame")
+TelaTools.Name = "TelaTools"
+TelaTools.Size = UDim2.new(1,-157,1,-61)
+TelaTools.Position = UDim2.fromOffset(149,53)
+TelaTools.BackgroundColor3 = Color3.fromRGB(30,30,30)
+TelaTools.BorderSizePixel = 0
+TelaTools.Visible = false
+TelaTools.Parent = Painel
 
-					if not gui then
-						gui = Instance.new("BillboardGui")
-						gui.Name = "JF_Vida"
-						gui.Size = UDim2.new(0, 8, 0, 70)
-						gui.StudsOffset = Vector3.new(-3, 0, 0)
-						gui.AlwaysOnTop = true
-						gui.Parent = character
+local tc = Instance.new("UICorner")
+tc.CornerRadius = UDim.new(0,6)
+tc.Parent = TelaTools
 
-						local fundo = Instance.new("Frame")
-						fundo.Name = "Fundo"
-						fundo.Size = UDim2.new(1, 0, 1, 0)
-						fundo.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-						fundo.BorderSizePixel = 0
-						fundo.Parent = gui
+local TituloTools = Instance.new("TextLabel")
+TituloTools.Size = UDim2.new(1,-24,0,28)
+TituloTools.Position = UDim2.fromOffset(12,8)
+TituloTools.BackgroundTransparency = 1
+TituloTools.Text = "TOOLS DO SERVIDOR"
+TituloTools.TextColor3 = Color3.fromRGB(235,235,235)
+TituloTools.Font = Enum.Font.GothamBold
+TituloTools.TextSize = 15
+TituloTools.TextXAlignment = Enum.TextXAlignment.Left
+TituloTools.Parent = TelaTools
 
-						local barra = Instance.new("Frame")
-						barra.Name = "Barra"
-						barra.AnchorPoint = Vector2.new(0, 1)
-						barra.Position = UDim2.new(0, 0, 1, 0)
-						barra.Size = UDim2.new(1, 0, 1, 0)
-						barra.BackgroundColor3 = Color3.fromRGB(50, 220, 80)
-						barra.BorderSizePixel = 0
-						barra.Parent = fundo
-					end
+local InfoTools = Instance.new("TextLabel")
+InfoTools.Size = UDim2.new(1,-24,0,20)
+InfoTools.Position = UDim2.fromOffset(12,104)
+InfoTools.BackgroundTransparency = 1
+InfoTools.Text = "Digite o nome da Tool para filtrar a lista"
+InfoTools.TextColor3 = Color3.fromRGB(145,145,145)
+InfoTools.Font = Enum.Font.Gotham
+InfoTools.TextSize = 10
+InfoTools.TextXAlignment = Enum.TextXAlignment.Left
+InfoTools.Parent = TelaTools
 
-					local fundo = gui:FindFirstChild("Fundo")
+--========================================================
+-- BUSCA MANUAL DE TOOL
+--========================================================
 
-					if fundo then
-						local barra = fundo:FindFirstChild("Barra")
+local CaixaBuscaTool = Instance.new("TextBox")
+CaixaBuscaTool.Name = "BuscaTool"
+CaixaBuscaTool.Size = UDim2.new(1,-24,0,34)
+CaixaBuscaTool.Position = UDim2.fromOffset(12,38)
+CaixaBuscaTool.BackgroundColor3 = Color3.fromRGB(42,42,42)
+CaixaBuscaTool.BorderSizePixel = 0
+CaixaBuscaTool.PlaceholderText = "Pesquisar Tool..."
+CaixaBuscaTool.Text = "ArmaPdsecreta"
+CaixaBuscaTool.ClearTextOnFocus = false
+CaixaBuscaTool.TextColor3 = Color3.fromRGB(235,235,235)
+CaixaBuscaTool.PlaceholderColor3 = Color3.fromRGB(120,120,120)
+CaixaBuscaTool.Font = Enum.Font.Gotham
+CaixaBuscaTool.TextSize = 11
+CaixaBuscaTool.TextXAlignment = Enum.TextXAlignment.Left
+CaixaBuscaTool.Parent = TelaTools
 
-						if barra then
-							local porcentagem = math.clamp(
-								humanoid.Health / math.max(humanoid.MaxHealth, 1),
-								0,
-								1
-							)
+local buscaCorner = Instance.new("UICorner")
+buscaCorner.CornerRadius = UDim.new(0,5)
+buscaCorner.Parent = CaixaBuscaTool
 
-							barra.Size = UDim2.new(
-								1,
-								0,
-								porcentagem,
-								0
-							)
+local PaddingBusca = Instance.new("UIPadding")
+PaddingBusca.PaddingLeft = UDim.new(0,10)
+PaddingBusca.PaddingRight = UDim.new(0,10)
+PaddingBusca.Parent = CaixaBuscaTool
+
+local BuscarTool = Instance.new("TextButton")
+BuscarTool.Size = UDim2.fromOffset(120,30)
+BuscarTool.Position = UDim2.new(1,-132,0,76)
+BuscarTool.BackgroundColor3 = Color3.fromRGB(150,0,0)
+BuscarTool.BorderSizePixel = 0
+BuscarTool.Text = "PROCURAR"
+BuscarTool.TextColor3 = Color3.fromRGB(255,255,255)
+BuscarTool.Font = Enum.Font.GothamBold
+BuscarTool.TextSize = 11
+BuscarTool.Parent = TelaTools
+
+local buscarCorner = Instance.new("UICorner")
+buscarCorner.CornerRadius = UDim.new(0,5)
+buscarCorner.Parent = BuscarTool
+
+local ListaTools = Instance.new("ScrollingFrame")
+ListaTools.Name = "ListaTools"
+ListaTools.Size = UDim2.new(1,-24,1,-160)
+ListaTools.Position = UDim2.fromOffset(12,128)
+ListaTools.BackgroundColor3 = Color3.fromRGB(24,24,24)
+ListaTools.BorderSizePixel = 0
+ListaTools.ScrollBarThickness = 5
+ListaTools.ScrollBarImageColor3 = Color3.fromRGB(150,0,0)
+ListaTools.CanvasSize = UDim2.fromOffset(0,0)
+ListaTools.AutomaticCanvasSize = Enum.AutomaticSize.Y
+ListaTools.Parent = TelaTools
+
+local ltc = Instance.new("UICorner")
+ltc.CornerRadius = UDim.new(0,6)
+ltc.Parent = ListaTools
+
+local ListaLayout = Instance.new("UIListLayout")
+ListaLayout.Padding = UDim.new(0,6)
+ListaLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+ListaLayout.SortOrder = Enum.SortOrder.LayoutOrder
+ListaLayout.Parent = ListaTools
+
+local ListaPadding = Instance.new("UIPadding")
+ListaPadding.PaddingTop = UDim.new(0,8)
+ListaPadding.PaddingBottom = UDim.new(0,8)
+ListaPadding.PaddingLeft = UDim.new(0,8)
+ListaPadding.PaddingRight = UDim.new(0,8)
+ListaPadding.Parent = ListaTools
+
+local AtualizarTools = Instance.new("TextButton")
+AtualizarTools.Size = UDim2.fromOffset(120,30)
+AtualizarTools.Position = UDim2.new(1,-132,0,76)
+AtualizarTools.BackgroundColor3 = Color3.fromRGB(42,42,42)
+AtualizarTools.BorderSizePixel = 0
+AtualizarTools.Text = "ATUALIZAR"
+AtualizarTools.TextColor3 = Color3.fromRGB(235,235,235)
+AtualizarTools.Font = Enum.Font.GothamBold
+AtualizarTools.TextSize = 11
+AtualizarTools.Parent = TelaTools
+
+local atc = Instance.new("UICorner")
+atc.CornerRadius = UDim.new(0,5)
+atc.Parent = AtualizarTools
+
+-- LocalScript só enxerga o que foi replicado para o cliente.
+local ToolsEncontradas = {}
+
+local function CaminhoSeguro(obj)
+    local ok, caminho = pcall(function()
+        return obj:GetFullName()
+    end)
+
+    if ok then
+        return caminho
+    end
+
+    return obj.Name
+end
+
+local function NormalizarNome(nome)
+    nome = tostring(nome or ""):lower()
+    nome = nome:gsub("[^%w]", "")
+    return nome
+end
+
+local function DistanciaTexto(a,b)
+    a = NormalizarNome(a)
+    b = NormalizarNome(b)
+
+    local la = #a
+    local lb = #b
+
+    if la == 0 then return lb end
+    if lb == 0 then return la end
+
+    local anterior = {}
+    for j = 0, lb do
+        anterior[j] = j
+    end
+
+    for i = 1, la do
+        local atual = {[0] = i}
+        local ca = a:sub(i,i)
+
+        for j = 1, lb do
+            local custo = (ca == b:sub(j,j)) and 0 or 1
+            atual[j] = math.min(
+                atual[j-1] + 1,
+                anterior[j] + 1,
+                anterior[j-1] + custo
+            )
+        end
+
+        anterior = atual
+    end
+
+    return anterior[lb]
+end
+
+local function PontuacaoNome(nome, alvo)
+    local n = NormalizarNome(nome)
+    local a = NormalizarNome(alvo)
+
+    if n == "" or a == "" then
+        return -1
+    end
+
+    if n == a then
+        return 1000
+    end
+
+    if n:find(a, 1, true) then
+        return 900 - math.abs(#n - #a)
+    end
+
+    if a:find(n, 1, true) then
+        return 850 - math.abs(#n - #a)
+    end
+
+    local distancia = DistanciaTexto(n, a)
+    local tamanho = math.max(#n, #a)
+
+    if tamanho <= 0 then
+        return -1
+    end
+
+    local semelhanca = 1 - (distancia / tamanho)
+
+    if semelhanca >= 0.55 then
+        return math.floor(semelhanca * 700)
+    end
+
+    return -1
+end
+
+local function DescobrirOrigem(tool)
+    if tool:IsDescendantOf(workspace) then
+        return "Mapa / Workspace"
+    elseif tool:IsDescendantOf(ReplicatedStorage) then
+        return "ReplicatedStorage"
+    elseif tool:IsDescendantOf(game:GetService("StarterPack")) then
+        return "StarterPack"
+    elseif LocalPlayer.Character and tool:IsDescendantOf(LocalPlayer.Character) then
+        return "Seu personagem"
+    elseif LocalPlayer:FindFirstChildOfClass("Backpack") and tool:IsDescendantOf(LocalPlayer:FindFirstChildOfClass("Backpack")) then
+        return "Seu Backpack"
+    end
+
+    return CaminhoSeguro(tool)
+end
+
+local function ColetarTools()
+    local resultado = {}
+    local encontrados = {}
+
+    for _, obj in ipairs(game:GetDescendants()) do
+        if obj:IsA("Tool") and obj.Archivable then
+            local caminho = CaminhoSeguro(obj)
+
+            if not encontrados[caminho] then
+                encontrados[caminho] = true
+
+                table.insert(resultado, {
+                    Name = obj.Name,
+                    Location = DescobrirOrigem(obj),
+                    Path = caminho,
+                    Instance = obj,
+                    Score = 0,
+                })
+            end
+        end
+    end
+
+    return resultado
+end
+
+local function LocalizarMelhorTool(nomeProcurado)
+    local melhor = nil
+    local melhorScore = -1
+
+    for _, obj in ipairs(game:GetDescendants()) do
+        if obj:IsA("Tool") and obj.Archivable then
+            local score = PontuacaoNome(obj.Name, nomeProcurado)
+
+            if score > melhorScore then
+                melhorScore = score
+                melhor = {
+                    Name = obj.Name,
+                    Location = DescobrirOrigem(obj),
+                    Path = CaminhoSeguro(obj),
+                    Instance = obj,
+                    Score = score,
+                }
+            end
+        end
+    end
+
+    return melhor, melhorScore
+end
+
+local function LocalizarToolsParecidas(nomeProcurado)
+    local resultado = {}
+    local vistos = {}
+
+    for _, obj in ipairs(game:GetDescendants()) do
+        if obj:IsA("Tool") and obj.Archivable then
+            local caminho = CaminhoSeguro(obj)
+
+            if not vistos[caminho] then
+                local score = PontuacaoNome(obj.Name, nomeProcurado)
+
+                if score >= 450 then
+                    vistos[caminho] = true
+
+                    table.insert(resultado, {
+                        Name = obj.Name,
+                        Location = DescobrirOrigem(obj),
+                        Path = caminho,
+                        Instance = obj,
+                        Score = score,
+                    })
+                end
+            end
+        end
+    end
+
+    table.sort(resultado, function(a,b)
+        if a.Score ~= b.Score then
+            return a.Score > b.Score
+        end
+        return string.lower(a.Name) < string.lower(b.Name)
+    end)
+
+    return resultado
+end
+
+local function LimparListaTools()
+    for _,obj in ipairs(ListaTools:GetChildren()) do
+        if obj:IsA("GuiObject") and obj ~= ListaLayout and obj ~= ListaPadding then
+            obj:Destroy()
+        end
+    end
+end
+
+local function ResetarBotao(pegar)
+    if not pegar or not pegar.Parent then
+        return
+    end
+
+    pegar.Text = "PEGAR"
+    pegar.BackgroundColor3 = Color3.fromRGB(150,0,0)
+end
+
+local function JaPossuiTool(nome)
+    local backpack = LocalPlayer:FindFirstChildOfClass("Backpack")
+
+    if backpack then
+        for _,obj in ipairs(backpack:GetChildren()) do
+            if obj:IsA("Tool") and obj.Name == nome then
+                return true
+            end
+        end
+    end
+
+    local character = LocalPlayer.Character
+    if character then
+        for _,obj in ipairs(character:GetChildren()) do
+            if obj:IsA("Tool") and obj.Name == nome then
+                return true
+            end
+        end
+    end
+
+    return false
+end
+
+local function ColocarNoInventario(info, botao)
+    local tool = info and info.Instance
+
+    -- Se a entrada veio da busca manual, tenta localizar de novo.
+    if (not tool or not tool.Parent) and info and info.Name then
+        local localizada = LocalizarMelhorTool(info.Name)
+        if localizada then
+            tool = localizada.Instance
+        end
+    end
+
+    if not tool or not tool.Parent then
+        botao.Text = "NÃO LOCALIZADA"
+        task.delay(1.8, function()
+            ResetarBotao(botao)
+        end)
+        return false
+    end
+
+    local backpack = LocalPlayer:FindFirstChildOfClass("Backpack")
+    if not backpack then
+        botao.Text = "SEM BACKPACK"
+        task.delay(1.5, function()
+            ResetarBotao(botao)
+        end)
+        return false
+    end
+
+    if JaPossuiTool(tool.Name) then
+        botao.Text = "JÁ POSSUI"
+        task.delay(1.2, function()
+            ResetarBotao(botao)
+        end)
+        return false
+    end
+
+    local clone
+    local ok = pcall(function()
+        clone = tool:Clone()
+    end)
+
+    if not ok or not clone then
+        botao.Text = "NÃO PODE COPIAR"
+        task.delay(1.5, function()
+            ResetarBotao(botao)
+        end)
+        return false
+    end
+
+    clone.Parent = backpack
+
+    task.defer(function()
+        if clone.Parent == backpack then
+            botao.Text = "NO INVENTÁRIO"
+            botao.BackgroundColor3 = Color3.fromRGB(30,120,55)
+        else
+            botao.Text = "FALHOU"
+        end
+    end)
+
+    task.delay(2, function()
+        ResetarBotao(botao)
+    end)
+
+    return true
+end
+
+local function CriarItemTool(info, indice, destaque)
+    local item = Instance.new("Frame")
+    item.Name = "Tool_" .. indice
+    item.LayoutOrder = indice
+    item.Size = UDim2.new(1,-8,0,64)
+    item.BackgroundColor3 = destaque and Color3.fromRGB(55,36,36) or Color3.fromRGB(42,42,42)
+    item.BorderSizePixel = 0
+    item.Parent = ListaTools
+
+    local ic = Instance.new("UICorner")
+    ic.CornerRadius = UDim.new(0,5)
+    ic.Parent = item
+
+    local nome = Instance.new("TextLabel")
+    nome.Size = UDim2.new(1,-140,0,25)
+    nome.Position = UDim2.fromOffset(10,5)
+    nome.BackgroundTransparency = 1
+    nome.Text = info.Name
+    nome.TextColor3 = Color3.fromRGB(235,235,235)
+    nome.Font = Enum.Font.GothamBold
+    nome.TextSize = 12
+    nome.TextXAlignment = Enum.TextXAlignment.Left
+    nome.TextTruncate = Enum.TextTruncate.AtEnd
+    nome.Parent = item
+
+    local localizacao = Instance.new("TextLabel")
+    localizacao.Size = UDim2.new(1,-140,0,30)
+    localizacao.Position = UDim2.fromOffset(10,29)
+    localizacao.BackgroundTransparency = 1
+    localizacao.Text = info.Location or "Origem desconhecida"
+    localizacao.TextColor3 = Color3.fromRGB(145,145,145)
+    localizacao.Font = Enum.Font.Gotham
+    localizacao.TextSize = 9
+    localizacao.TextXAlignment = Enum.TextXAlignment.Left
+    localizacao.TextTruncate = Enum.TextTruncate.AtEnd
+    localizacao.Parent = item
+
+    local pegar = Instance.new("TextButton")
+    pegar.Size = UDim2.fromOffset(105,34)
+    pegar.Position = UDim2.new(1,-115,0.5,-17)
+    pegar.BackgroundColor3 = Color3.fromRGB(150,0,0)
+    pegar.BorderSizePixel = 0
+    pegar.Text = "PEGAR"
+    pegar.TextColor3 = Color3.fromRGB(255,255,255)
+    pegar.Font = Enum.Font.GothamBold
+    pegar.TextSize = 11
+    pegar.Parent = item
+
+    local pc = Instance.new("UICorner")
+    pc.CornerRadius = UDim.new(0,5)
+    pc.Parent = pegar
+
+    pegar.MouseButton1Click:Connect(function()
+        pegar.Text = "PEGANDO..."
+        ColocarNoInventario(info, pegar)
+    end)
+end
+
+local function MostrarTools(lista)
+    LimparListaTools()
+    ToolsEncontradas = lista or {}
+
+    if not lista or #lista == 0 then
+        local vazio = Instance.new("TextLabel")
+        vazio.Size = UDim2.new(1,-8,0,75)
+        vazio.BackgroundTransparency = 1
+        vazio.Text = "Nenhuma Tool encontrada. Use o campo acima para procurar por nome."
+        vazio.TextColor3 = Color3.fromRGB(150,150,150)
+        vazio.Font = Enum.Font.Gotham
+        vazio.TextSize = 12
+        vazio.TextWrapped = true
+        vazio.Parent = ListaTools
+        return
+    end
+
+    local alvo = NormalizarNome(CaixaBuscaTool.Text)
+
+    table.sort(lista, function(a,b)
+        local sa = PontuacaoNome(a.Name, alvo)
+        local sb = PontuacaoNome(b.Name, alvo)
+        if sa ~= sb then
+            return sa > sb
+        end
+        return string.lower(a.Name) < string.lower(b.Name)
+    end)
+
+    for indice,info in ipairs(lista) do
+        CriarItemTool(info, indice, PontuacaoNome(info.Name, "ArmaPdsecreta") >= 850)
+    end
+end
+
+local function CarregarTools()
+    AtualizarTools.Text = "BUSCANDO..."
+
+    local ok, lista = pcall(ColetarTools)
+
+    if ok then
+        local temAlvo = false
+        for _, info in ipairs(lista) do
+            if PontuacaoNome(info.Name, "ArmaPdsecreta") >= 450 then
+                temAlvo = true
+                break
+            end
+        end
+
+        if not temAlvo then
+            table.insert(lista, 1, {
+                Name = "ArmaPdsecreta",
+                Location = "Busca manual / não localizada ainda",
+                Instance = nil,
+                Path = "",
+                Score = 0,
+            })
+        end
+
+        MostrarTools(lista)
+        InfoTools.Text = tostring(#lista) .. " entrada(s) encontrada(s); ArmaPdsecreta também fica disponível na busca manual"
+    else
+        MostrarTools({})
+        InfoTools.Text = "A busca automática falhou; use a busca manual"
+    end
+
+    AtualizarTools.Text = "ATUALIZAR"
+end
+
+local function ProcurarPorNome()
+    local alvo = CaixaBuscaTool.Text:gsub("^%s+", ""):gsub("%s+$", "")
+
+    if alvo == "" then
+        alvo = "ArmaPdsecreta"
+        CaixaBuscaTool.Text = alvo
+    end
+
+    BuscarTool.Text = "BUSCANDO..."
+    LimparListaTools()
+
+    local parecidas = LocalizarToolsParecidas(alvo)
+
+    if #parecidas > 0 then
+        InfoTools.Text = tostring(#parecidas) .. " Tool(s) encontrada(s) para: " .. alvo
+
+        for indice, info in ipairs(parecidas) do
+            CriarItemTool(info, indice, PontuacaoNome(info.Name, "ArmaPdsecreta") >= 850)
+        end
+    else
+        -- Entrada manual garantida para o nome digitado.
+        -- O clique tenta procurar novamente no momento de pegar.
+        local manual = {
+            Name = alvo,
+            Location = "Busca manual / não localizada ainda",
+            Instance = nil,
+            Path = "",
+        }
+
+        CriarItemTool(manual, 1, true)
+        InfoTools.Text = "Nenhuma Tool parecida foi localizada. A busca manual continua disponível."
+    end
+
+    BuscarTool.Text = "PROCURAR"
+end
+
+BuscarTool.MouseButton1Click:Connect(ProcurarPorNome)
+
+CaixaBuscaTool:GetPropertyChangedSignal("Text"):Connect(function()
+    local texto = CaixaBuscaTool.Text
+    if texto == "" then
+        MostrarTools(ToolsEncontradas)
+        InfoTools.Text = "Digite o nome da Tool para filtrar a lista"
+        return
+    end
+
+    local filtradas = LocalizarToolsParecidas(texto)
+
+    if #filtradas > 0 then
+        MostrarTools(filtradas)
+        InfoTools.Text = tostring(#filtradas) .. " Tool(s) encontrada(s) para: " .. texto
+    else
+        local manual = {
+            Name = texto,
+            Location = "Busca manual / não localizada ainda",
+            Instance = nil,
+            Path = "",
+            Score = 0,
+        }
+        MostrarTools({manual})
+        InfoTools.Text = "Nenhuma Tool encontrada. O botão PEGAR ainda tentará localizar: " .. texto
+    end
+end)
+
+CaixaBuscaTool.FocusLost:Connect(function(enterPressed)
+    if enterPressed then
+        ProcurarPorNome()
+    end
+end)
+
+AtualizarTools.MouseButton1Click:Connect(CarregarTools)
+
+-- Atualiza automaticamente quando uma Tool replicada chega ao cliente.
+game.DescendantAdded:Connect(function(obj)
+    if obj:IsA("Tool") and TelaTools.Visible then
+        task.delay(0.2, function()
+            if TelaTools.Visible then
+                local termo = NormalizarNome(CaixaBuscaTool.Text)
+                if termo ~= "" then
+                    ProcurarPorNome()
+                else
+                    CarregarTools()
+                end
+            end
+        end)
+    end
+end)
+
+--========================================================
+-- MIRA
+--========================================================
+
+--========================================================
+-- MIRA
+--========================================================
+
+local BotaoMira,ToggleMira,BolaMira =
+	CriarOpcao("Mira Assistida",162)
+
+BotaoMira.MouseButton1Click:Connect(function()
+
+	MIRA_ATIVADA = not MIRA_ATIVADA
+
+	Alternar(
+		ToggleMira,
+		BolaMira,
+		MIRA_ATIVADA
+	)
+end)
+
+--========================================================
+-- LOCAL DA MIRA
+--========================================================
+
+local TextoParte = Instance.new("TextLabel")
+TextoParte.Size = UDim2.new(1,-24,0,25)
+TextoParte.Position = UDim2.fromOffset(12,218)
+TextoParte.BackgroundTransparency = 1
+TextoParte.Text = "LOCAL DA MIRA"
+TextoParte.TextColor3 = Color3.fromRGB(160,160,160)
+TextoParte.Font = Enum.Font.GothamBold
+TextoParte.TextSize = 11
+TextoParte.TextXAlignment = Enum.TextXAlignment.Left
+TextoParte.Parent = Home
+
+local Partes = {
+	"Cabeça",
+	"Torso",
+	"Perna"
+}
+
+local BotoesPartes = {}
+
+for i,parte in ipairs(Partes) do
+
+	local b = Instance.new("TextButton")
+
+	b.Size = UDim2.fromOffset(82,34)
+	b.Position =
+		UDim2.fromOffset(
+			12 + ((i-1)*88),
+			245
+		)
+
+	b.BackgroundColor3 = Color3.fromRGB(42,42,42)
+	b.BorderSizePixel = 0
+	b.Text = parte
+	b.TextColor3 = Color3.fromRGB(220,220,220)
+	b.Font = Enum.Font.GothamBold
+	b.TextSize = 11
+	b.Parent = Home
+
+	local c = Instance.new("UICorner")
+	c.CornerRadius = UDim.new(0,5)
+	c.Parent = b
+
+	BotoesPartes[parte] = b
+
+	b.MouseButton1Click:Connect(function()
+
+		PARTE_MIRA = parte
+
+		for _,outro in pairs(BotoesPartes) do
+			outro.BackgroundColor3 =
+				Color3.fromRGB(42,42,42)
+		end
+
+		b.BackgroundColor3 =
+			Color3.fromRGB(150,0,0)
+	end)
+end
+
+--========================================================
+-- FOV SLIDER
+--========================================================
+
+local TextoFOV = Instance.new("TextLabel")
+TextoFOV.Size = UDim2.new(1,-24,0,25)
+TextoFOV.Position = UDim2.fromOffset(12,288)
+TextoFOV.BackgroundTransparency = 1
+TextoFOV.Text = "TAMANHO DO FOV: 150"
+TextoFOV.TextColor3 = Color3.fromRGB(160,160,160)
+TextoFOV.Font = Enum.Font.GothamBold
+TextoFOV.TextSize = 11
+TextoFOV.TextXAlignment = Enum.TextXAlignment.Left
+TextoFOV.Parent = Home
+
+local FundoSlider = Instance.new("Frame")
+FundoSlider.Size = UDim2.new(1,-24,0,7)
+FundoSlider.Position = UDim2.fromOffset(12,322)
+FundoSlider.BackgroundColor3 = Color3.fromRGB(15,15,15)
+FundoSlider.BorderSizePixel = 0
+FundoSlider.Parent = Home
+
+local fs = Instance.new("UICorner")
+fs.CornerRadius = UDim.new(1,0)
+fs.Parent = FundoSlider
+
+local Preenchimento = Instance.new("Frame")
+Preenchimento.Size = UDim2.new(0.285,0,1,0)
+Preenchimento.BackgroundColor3 = Color3.fromRGB(255,0,0)
+Preenchimento.BorderSizePixel = 0
+Preenchimento.Parent = FundoSlider
+
+local fpc = Instance.new("UICorner")
+fpc.CornerRadius = UDim.new(1,0)
+fpc.Parent = Preenchimento
+
+local Pino = Instance.new("Frame")
+Pino.Size = UDim2.fromOffset(16,16)
+Pino.AnchorPoint = Vector2.new(0.5,0.5)
+Pino.Position = UDim2.new(0.285,0,0.5,0)
+Pino.BackgroundColor3 = Color3.fromRGB(255,255,255)
+Pino.BorderSizePixel = 0
+Pino.Parent = FundoSlider
+
+local pinoC = Instance.new("UICorner")
+pinoC.CornerRadius = UDim.new(1,0)
+pinoC.Parent = Pino
+
+local arrastandoFOV = false
+
+local function AtualizarFOV(valor)
+
+	valor = math.clamp(valor,0,1)
+
+	TAMANHO_FOV =
+		math.floor(50 + valor * 350)
+
+	TextoFOV.Text =
+		"TAMANHO DO FOV: "..TAMANHO_FOV
+
+	Preenchimento.Size =
+		UDim2.new(valor,0,1,0)
+
+	Pino.Position =
+		UDim2.new(valor,0,0.5,0)
+end
+
+Pino.InputBegan:Connect(function(input)
+
+	if input.UserInputType == Enum.UserInputType.MouseButton1
+		or input.UserInputType == Enum.UserInputType.Touch then
+
+		arrastandoFOV = true
+	end
+end)
+
+FundoSlider.InputBegan:Connect(function(input)
+
+	if input.UserInputType == Enum.UserInputType.MouseButton1
+		or input.UserInputType == Enum.UserInputType.Touch then
+
+		local x = input.Position.X
+		local inicio = FundoSlider.AbsolutePosition.X
+		local largura = FundoSlider.AbsoluteSize.X
+
+		AtualizarFOV(
+			(x-inicio)/largura
+		)
+
+		arrastandoFOV = true
+	end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+
+	if input.UserInputType == Enum.UserInputType.MouseButton1
+		or input.UserInputType == Enum.UserInputType.Touch then
+
+		arrastandoFOV = false
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+
+	if not arrastandoFOV then
+		return
+	end
+
+	if input.UserInputType == Enum.UserInputType.MouseMovement
+		or input.UserInputType == Enum.UserInputType.Touch then
+
+		local x = input.Position.X
+		local inicio = FundoSlider.AbsolutePosition.X
+		local largura = FundoSlider.AbsoluteSize.X
+
+		AtualizarFOV(
+			(x-inicio)/largura
+		)
+	end
+end)
+
+--========================================================
+-- CÍRCULO FOV
+--========================================================
+
+local CirculoFOV = Instance.new("Frame")
+CirculoFOV.Size =
+	UDim2.fromOffset(
+		TAMANHO_FOV*2,
+		TAMANHO_FOV*2
+	)
+
+CirculoFOV.AnchorPoint =
+	Vector2.new(0.5,0.5)
+
+CirculoFOV.Position =
+	UDim2.fromScale(0.5,0.5)
+
+CirculoFOV.BackgroundTransparency = 1
+CirculoFOV.Visible = false
+CirculoFOV.Parent = Interface
+
+local cfc = Instance.new("UICorner")
+cfc.CornerRadius = UDim.new(1,0)
+cfc.Parent = CirculoFOV
+
+local cfs = Instance.new("UIStroke")
+cfs.Color = Color3.fromRGB(255,0,0)
+cfs.Thickness = 2
+cfs.Parent = CirculoFOV
+
+--========================================================
+-- ESP
+--========================================================
+
+local ESPs = {}
+local BarrasVida = {}
+
+local function CriarESP(player)
+
+	if ESPs[player] then
+		return ESPs[player]
+	end
+
+	local caixa = Instance.new("Frame")
+
+	caixa.BackgroundTransparency = 1
+	caixa.BorderSizePixel = 0
+	caixa.Visible = false
+	caixa.Parent = Interface
+
+	local stroke = Instance.new("UIStroke")
+	stroke.Color = Color3.fromRGB(255,0,0)
+	stroke.Thickness = 2
+	stroke.Parent = caixa
+
+	local fundoVida = Instance.new("Frame")
+	fundoVida.Name = "FundoVida"
+	fundoVida.BackgroundColor3 = Color3.fromRGB(15,15,15)
+	fundoVida.BorderSizePixel = 0
+	fundoVida.Visible = false
+	fundoVida.ZIndex = 20
+	fundoVida.Parent = Interface
+
+	local cantoFundo = Instance.new("UICorner")
+	cantoFundo.CornerRadius = UDim.new(0,2)
+	cantoFundo.Parent = fundoVida
+
+	local preenchimentoVida = Instance.new("Frame")
+	preenchimentoVida.Name = "PreenchimentoVida"
+	preenchimentoVida.AnchorPoint = Vector2.new(0,1)
+	preenchimentoVida.Position = UDim2.new(0,0,1,0)
+	preenchimentoVida.Size = UDim2.new(1,0,1,0)
+	preenchimentoVida.BackgroundColor3 = Color3.fromRGB(40,220,80)
+	preenchimentoVida.BorderSizePixel = 0
+	preenchimentoVida.ZIndex = 21
+	preenchimentoVida.Parent = fundoVida
+
+	local cantoPreenchimento = Instance.new("UICorner")
+	cantoPreenchimento.CornerRadius = UDim.new(0,2)
+	cantoPreenchimento.Parent = preenchimentoVida
+
+	ESPs[player] = caixa
+	BarrasVida[player] = {
+		Fundo = fundoVida,
+		Preenchimento = preenchimentoVida,
+	}
+
+	return caixa
+end
+
+Players.PlayerRemoving:Connect(function(player)
+
+	if ESPs[player] then
+		ESPs[player]:Destroy()
+		ESPs[player] = nil
+	end
+
+	if BarrasVida[player] then
+		BarrasVida[player].Fundo:Destroy()
+		BarrasVida[player] = nil
+	end
+end)
+
+local function Limites(character)
+
+	local cf,size =
+		character:GetBoundingBox()
+
+	local metade = size/2
+
+	local minX = math.huge
+	local maxX = -math.huge
+	local minY = math.huge
+	local maxY = -math.huge
+
+	local achou = false
+
+	for _,v in ipairs({
+		Vector3.new(-metade.X,-metade.Y,-metade.Z),
+		Vector3.new(-metade.X,-metade.Y,metade.Z),
+		Vector3.new(-metade.X,metade.Y,-metade.Z),
+		Vector3.new(-metade.X,metade.Y,metade.Z),
+		Vector3.new(metade.X,-metade.Y,-metade.Z),
+		Vector3.new(metade.X,-metade.Y,metade.Z),
+		Vector3.new(metade.X,metade.Y,-metade.Z),
+		Vector3.new(metade.X,metade.Y,metade.Z)
+	}) do
+
+		local world = cf:PointToWorldSpace(v)
+		local screen = Camera:WorldToViewportPoint(world)
+
+		if screen.Z > 0 then
+
+			achou = true
+
+			minX = math.min(minX,screen.X)
+			maxX = math.max(maxX,screen.X)
+			minY = math.min(minY,screen.Y)
+			maxY = math.max(maxY,screen.Y)
+		end
+	end
+
+	if not achou then
+		return nil
+	end
+
+	return minX,maxX,minY,maxY
+end
+
+--========================================================
+-- MIRA
+--========================================================
+
+local function PegarParte(character)
+
+	if PARTE_MIRA == "Cabeça" then
+
+		return character:FindFirstChild("Head")
+
+	elseif PARTE_MIRA == "Torso" then
+
+		return character:FindFirstChild("UpperTorso")
+			or character:FindFirstChild("Torso")
+
+	else
+
+		return character:FindFirstChild("LeftLowerLeg")
+			or character:FindFirstChild("LeftUpperLeg")
+			or character:FindFirstChild("Left Leg")
+	end
+end
+
+local function PegarAlvo()
+
+	local centro = Vector2.new(
+		Camera.ViewportSize.X/2,
+		Camera.ViewportSize.Y/2
+	)
+
+	local alvoFinal = nil
+	local menor = TAMANHO_FOV
+
+	for _,player in ipairs(Players:GetPlayers()) do
+
+		if player ~= LocalPlayer then
+
+			local char = player.Character
+
+			if char then
+
+				local humanoid =
+					char:FindFirstChildOfClass("Humanoid")
+
+				local parte =
+					PegarParte(char)
+
+				if humanoid
+					and humanoid.Health > 0
+					and parte then
+
+					local pos,visivel =
+						Camera:WorldToViewportPoint(
+							parte.Position
+						)
+
+					if visivel then
+
+						local distancia =
+							(
+								Vector2.new(
+									pos.X,
+									pos.Y
+								)-centro
+							).Magnitude
+
+						if distancia < menor then
+
+							menor = distancia
+							alvoFinal = parte
 						end
 					end
 				end
 			end
 		end
 	end
+
+	return alvoFinal
 end
 
 --========================================================
--- SPAWN MARCADO
+-- AÇÕES
 --========================================================
 
-local function MarcarSpawn()
-	if not Player.Character then
-		return
-	end
+local function CriarAcao(texto,y)
 
-	local root = Player.Character:FindFirstChild("HumanoidRootPart")
+	local b = Instance.new("TextButton")
 
-	if not root then
-		return
-	end
+	b.Size = UDim2.new(1,-24,0,48)
+	b.Position = UDim2.fromOffset(12,y)
+	b.BackgroundColor3 = Color3.fromRGB(42,42,42)
+	b.BorderSizePixel = 0
+	b.Text = texto
+	b.TextColor3 = Color3.fromRGB(235,235,235)
+	b.Font = Enum.Font.GothamBold
+	b.TextSize = 13
+	b.Parent = Home
+
+	local c = Instance.new("UICorner")
+	c.CornerRadius = UDim.new(0,6)
+	c.Parent = b
+
+	return b
+end
+
+local TituloJogador = Instance.new("TextLabel")
+TituloJogador.Size = UDim2.new(1,-24,0,25)
+TituloJogador.Position = UDim2.fromOffset(12,350)
+TituloJogador.BackgroundTransparency = 1
+TituloJogador.Text = "JOGADOR"
+TituloJogador.TextColor3 = Color3.fromRGB(160,160,160)
+TituloJogador.Font = Enum.Font.GothamBold
+TituloJogador.TextSize = 11
+TituloJogador.TextXAlignment = Enum.TextXAlignment.Left
+TituloJogador.Parent = Home
+
+local BotaoSpawn =
+	CriarAcao(
+		"Marcar Spawn Neste Local",
+		380
+	)
+
+BotaoSpawn.MouseButton1Click:Connect(function()
+
+	local char = LocalPlayer.Character
+	if not char then return end
+
+	local root = char:FindFirstChild("HumanoidRootPart")
+	if not root then return end
 
 	spawnMarcado = root.CFrame
 
@@ -1214,65 +1743,81 @@ local function MarcarSpawn()
 	end
 
 	marcadorSpawn = Instance.new("Part")
-	marcadorSpawn.Name = "JF_MarcadorSpawn"
-	marcadorSpawn.Size = Vector3.new(2, 0.2, 2)
+	marcadorSpawn.Size = Vector3.new(4,0.25,4)
+	marcadorSpawn.CFrame =
+		root.CFrame * CFrame.new(0,-3,0)
+
 	marcadorSpawn.Anchored = true
 	marcadorSpawn.CanCollide = false
-	marcadorSpawn.Transparency = 0.4
-	marcadorSpawn.Color = Color3.fromRGB(0, 170, 255)
-	marcadorSpawn.CFrame = root.CFrame * CFrame.new(0, -3, 0)
+	marcadorSpawn.CanTouch = false
+	marcadorSpawn.CanQuery = false
+	marcadorSpawn.Material = Enum.Material.Neon
+	marcadorSpawn.Color = Color3.fromRGB(255,0,0)
+	marcadorSpawn.Transparency = 0.25
 	marcadorSpawn.Parent = workspace
-end
 
-local function VoltarSpawn()
+	BotaoSpawn.Text = "✓  Spawn Marcado!"
+
+	task.delay(1.5,function()
+
+		if BotaoSpawn.Parent then
+			BotaoSpawn.Text =
+				"Marcar Spawn Neste Local"
+		end
+	end)
+end)
+
+local BotaoVoltar =
+	CriarAcao(
+		"Voltar Para Spawn",
+		436
+	)
+
+BotaoVoltar.MouseButton1Click:Connect(function()
+
 	if not spawnMarcado then
+
+		BotaoVoltar.Text =
+			"Marque um Spawn Primeiro"
+
+		task.delay(1.5,function()
+
+			if BotaoVoltar.Parent then
+				BotaoVoltar.Text =
+					"Voltar Para Spawn"
+			end
+		end)
+
 		return
 	end
 
-	if not Player.Character then
-		return
-	end
+	local char = LocalPlayer.Character
+	if not char then return end
 
-	local root = Player.Character:FindFirstChild("HumanoidRootPart")
+	local root = char:FindFirstChild("HumanoidRootPart")
 
 	if root then
-		root.CFrame = spawnMarcado
+
+		root.CFrame =
+			spawnMarcado *
+			CFrame.new(0,3,0)
 	end
-end
+end)
 
 --========================================================
 -- VIDA INFINITA
 --========================================================
 
-local function AtivarVidaInfinita()
+local BotaoVidaInfinita =
+	CriarAcao(
+		"Vida Infinita: DESLIGADA",
+		492
+	)
+
+local function DesconectarVida()
+
 	if conexaoVida then
-		conexaoVida:Disconnect()
-		conexaoVida = nil
-	end
 
-	if not Player.Character then
-		return
-	end
-
-	local humanoid = Player.Character:FindFirstChildOfClass("Humanoid")
-
-	if not humanoid then
-		return
-	end
-
-	personagemProtegido = Player.Character
-
-	conexaoVida = humanoid.HealthChanged:Connect(function()
-		if VIDA_INFINITA and humanoid.Health < humanoid.MaxHealth then
-			humanoid.Health = humanoid.MaxHealth
-		end
-	end)
-
-	humanoid.Health = humanoid.MaxHealth
-end
-
-local function DesativarVidaInfinita()
-	if conexaoVida then
 		conexaoVida:Disconnect()
 		conexaoVida = nil
 	end
@@ -1280,286 +1825,328 @@ local function DesativarVidaInfinita()
 	personagemProtegido = nil
 end
 
---========================================================
--- AÇÕES CONFIG
---========================================================
+local function AtivarVida(character)
 
-local function ProcurarValor(nome)
-	if not Player.Character then
-		return nil
+	DesconectarVida()
+
+	local humanoid =
+		character:FindFirstChildOfClass("Humanoid")
+
+	if not humanoid then
+		return
 	end
 
-	local valor = Player.Character:FindFirstChild(nome)
+	personagemProtegido = character
 
-	if valor then
-		return valor
-	end
+	humanoid.Health =
+		humanoid.MaxHealth
 
-	valor = Player:FindFirstChild(nome)
+	conexaoVida =
+		humanoid:GetPropertyChangedSignal(
+			"Health"
+		):Connect(function()
 
-	if valor then
-		return valor
-	end
+			if not VIDA_INFINITA then
+				return
+			end
 
-	return nil
+			if humanoid.Parent
+				and humanoid.Health < humanoid.MaxHealth then
+
+				humanoid.Health =
+					humanoid.MaxHealth
+			end
+		end)
 end
 
-local function PreencherFome()
-	local nomes = {
-		"Fome",
-		"fome",
-		"Hunger",
-		"hunger"
-	}
+BotaoVidaInfinita.MouseButton1Click:Connect(function()
 
-	for _, nome in ipairs(nomes) do
-		local valor = ProcurarValor(nome)
+	VIDA_INFINITA =
+		not VIDA_INFINITA
 
-		if valor and valor:IsA("NumberValue") or valor and valor:IsA("IntValue") then
-			valor.Value = 100
-			return
+	if VIDA_INFINITA then
+
+		BotaoVidaInfinita.Text =
+			"Vida Infinita: LIGADA"
+
+		if LocalPlayer.Character then
+			AtivarVida(LocalPlayer.Character)
 		end
+
+	else
+
+		BotaoVidaInfinita.Text =
+			"Vida Infinita: DESLIGADA"
+
+		DesconectarVida()
 	end
-
-	if Player.Character then
-		Player.Character:SetAttribute("Fome", 100)
-		Player.Character:SetAttribute("fome", 100)
-		Player.Character:SetAttribute("Hunger", 100)
-	end
-
-	Player:SetAttribute("Fome", 100)
-	Player:SetAttribute("fome", 100)
-	Player:SetAttribute("Hunger", 100)
-end
-
-local function PreencherSede()
-	local nomes = {
-		"Sede",
-		"sede",
-		"Thirst",
-		"thirst"
-	}
-
-	for _, nome in ipairs(nomes) do
-		local valor = ProcurarValor(nome)
-
-		if valor and valor:IsA("NumberValue") or valor and valor:IsA("IntValue") then
-			valor.Value = 100
-			return
-		end
-	end
-
-	if Player.Character then
-		Player.Character:SetAttribute("Sede", 100)
-		Player.Character:SetAttribute("sede", 100)
-		Player.Character:SetAttribute("Thirst", 100)
-	end
-
-	Player:SetAttribute("Sede", 100)
-	Player:SetAttribute("sede", 100)
-	Player:SetAttribute("Thirst", 100)
-end
+end)
 
 --========================================================
--- CONFIGURAÇÕES
+-- REGENERAR
 --========================================================
 
-local function AbrirConfig()
-	LimparConteudo()
+local BotaoVida =
+	CriarAcao(
+		"Regenerar Vida",
+		548
+	)
 
-	local titulo = Instance.new("TextLabel")
-	titulo.Size = UDim2.new(1, -20, 0, 30)
-	titulo.Position = UDim2.new(0, 10, 0, 8)
-	titulo.BackgroundTransparency = 1
-	titulo.Text = "CONFIGURAÇÕES"
-	titulo.TextColor3 = Color3.fromRGB(255, 255, 255)
-	titulo.Font = Enum.Font.GothamBold
-	titulo.TextSize = 16
-	titulo.TextXAlignment = Enum.TextXAlignment.Left
-	titulo.Parent = Conteudo
+BotaoVida.MouseButton1Click:Connect(function()
 
-	CriarToggle("MIRA ASSISTIDA", MIRA_ATIVADA, function(valor)
-		MIRA_ATIVADA = valor
-	end, 50)
+	local char = LocalPlayer.Character
+	if not char then return end
 
-	local parteTitulo = Instance.new("TextLabel")
-	parteTitulo.Size = UDim2.new(1, -20, 0, 25)
-	parteTitulo.Position = UDim2.new(0, 10, 0, 98)
-	parteTitulo.BackgroundTransparency = 1
-	parteTitulo.Text = "PARTE DA MIRA"
-	parteTitulo.TextColor3 = Color3.fromRGB(180, 180, 180)
-	parteTitulo.Font = Enum.Font.GothamBold
-	parteTitulo.TextSize = 11
-	parteTitulo.TextXAlignment = Enum.TextXAlignment.Left
-	parteTitulo.Parent = Conteudo
+	local humanoid =
+		char:FindFirstChildOfClass("Humanoid")
 
-	local ParteButton = Instance.new("TextButton")
-	ParteButton.Size = UDim2.new(1, -20, 0, 35)
-	ParteButton.Position = UDim2.new(0, 10, 0, 123)
-	ParteButton.BackgroundColor3 = Color3.fromRGB(42, 42, 47)
-	ParteButton.BorderSizePixel = 0
-	ParteButton.Text = PARTE_MIRA
-	ParteButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-	ParteButton.Font = Enum.Font.GothamBold
-	ParteButton.TextSize = 12
-	ParteButton.Parent = Conteudo
+	if humanoid then
 
-	local parteCanto = Instance.new("UICorner")
-	parteCanto.CornerRadius = UDim.new(0, 5)
-	parteCanto.Parent = ParteButton
+		humanoid.Health =
+			humanoid.MaxHealth
 
-	ParteButton.MouseButton1Click:Connect(function()
-		if PARTE_MIRA == "Cabeça" then
-			PARTE_MIRA = "Torso"
-		elseif PARTE_MIRA == "Torso" then
-			PARTE_MIRA = "HumanoidRootPart"
-		else
-			PARTE_MIRA = "Cabeça"
+		BotaoVida.Text =
+			"✓  Vida Completa!"
+
+		task.delay(1.5,function()
+
+			if BotaoVida.Parent then
+				BotaoVida.Text =
+					"Regenerar Vida"
+			end
+		end)
+	end
+end)
+
+
+--========================================================
+-- ENCHER BARRA DE FOME
+--========================================================
+
+local BotaoFome =
+	CriarAcao(
+		"Encher Barra de Fome",
+		604
+	)
+
+local function EncherFome()
+	-- Procura um NumberValue/IntValue chamado Fome no Player
+	-- ou no Character.
+	local fome = LocalPlayer:FindFirstChild("Fome")
+
+	if not fome and LocalPlayer.Character then
+		fome = LocalPlayer.Character:FindFirstChild("Fome")
+	end
+
+	if fome and (fome:IsA("NumberValue") or fome:IsA("IntValue")) then
+		fome.Value = 100
+	end
+
+	-- Também suporta sistemas que usam Attribute.
+	if LocalPlayer:GetAttribute("Fome") ~= nil then
+		LocalPlayer:SetAttribute("Fome",100)
+	end
+
+	if LocalPlayer.Character
+		and LocalPlayer.Character:GetAttribute("Fome") ~= nil then
+
+		LocalPlayer.Character:SetAttribute("Fome",100)
+	end
+end
+
+BotaoFome.MouseButton1Click:Connect(function()
+
+	EncherFome()
+
+	BotaoFome.Text = "✓  Fome Completa!"
+
+	task.delay(1.5,function()
+
+		if BotaoFome.Parent then
+			BotaoFome.Text =
+				"Encher Barra de Fome"
 		end
-
-		ParteButton.Text = PARTE_MIRA
 	end)
+end)
 
-	local fovTitulo = Instance.new("TextLabel")
-	fovTitulo.Size = UDim2.new(1, -20, 0, 25)
-	fovTitulo.Position = UDim2.new(0, 10, 0, 168)
-	fovTitulo.BackgroundTransparency = 1
-	fovTitulo.Text = "TAMANHO DO FOV: " .. tostring(TAMANHO_FOV)
-	fovTitulo.TextColor3 = Color3.fromRGB(180, 180, 180)
-	fovTitulo.Font = Enum.Font.GothamBold
-	fovTitulo.TextSize = 11
-	fovTitulo.TextXAlignment = Enum.TextXAlignment.Left
-	fovTitulo.Parent = Conteudo
 
-	local slider = Instance.new("TextButton")
-	slider.Size = UDim2.new(1, -20, 0, 35)
-	slider.Position = UDim2.new(0, 10, 0, 193)
-	slider.BackgroundColor3 = Color3.fromRGB(42, 42, 47)
-	slider.BorderSizePixel = 0
-	slider.Text = "CLIQUE PARA AUMENTAR"
-	slider.TextColor3 = Color3.fromRGB(220, 220, 220)
-	slider.Font = Enum.Font.Gotham
-	slider.TextSize = 11
-	slider.Parent = Conteudo
+--========================================================
+-- ENCHER BARRA DE SEDE
+--========================================================
 
-	local sliderCanto = Instance.new("UICorner")
-	sliderCanto.CornerRadius = UDim.new(0, 5)
-	sliderCanto.Parent = slider
+local BotaoSede =
+	CriarAcao(
+		"Encher Barra de Sede",
+		660
+	)
 
-	slider.MouseButton1Click:Connect(function()
-		TAMANHO_FOV += 25
+local function EncherSede()
+	-- Procura um NumberValue/IntValue chamado Sede no Player
+	-- ou no Character.
+	local sede = LocalPlayer:FindFirstChild("Sede")
 
-		if TAMANHO_FOV > 300 then
-			TAMANHO_FOV = 50
-		end
+	if not sede and LocalPlayer.Character then
+		sede = LocalPlayer.Character:FindFirstChild("Sede")
+	end
 
-		fovTitulo.Text = "TAMANHO DO FOV: " .. tostring(TAMANHO_FOV)
+	if sede and (sede:IsA("NumberValue") or sede:IsA("IntValue")) then
+		sede.Value = 100
+	end
 
-		FOVCircle.Size = UDim2.new(
-			0,
-			TAMANHO_FOV * 2,
-			0,
-			TAMANHO_FOV * 2
-		)
-	end)
+	-- Também suporta sistemas que usam Attribute.
+	if LocalPlayer:GetAttribute("Sede") ~= nil then
+		LocalPlayer:SetAttribute("Sede",100)
+	end
 
-	local spawn = Instance.new("TextButton")
-	spawn.Size = UDim2.new(1, -20, 0, 35)
-	spawn.Position = UDim2.new(0, 10, 0, 240)
-	spawn.BackgroundColor3 = Color3.fromRGB(42, 42, 47)
-	spawn.BorderSizePixel = 0
-	spawn.Text = "MARCAR SPAWN"
-	spawn.TextColor3 = Color3.fromRGB(255, 255, 255)
-	spawn.Font = Enum.Font.GothamBold
-	spawn.TextSize = 12
-	spawn.Parent = Conteudo
+	if LocalPlayer.Character
+		and LocalPlayer.Character:GetAttribute("Sede") ~= nil then
 
-	local spawnCanto = Instance.new("UICorner")
-	spawnCanto.CornerRadius = UDim.new(0, 5)
-	spawnCanto.Parent = spawn
-
-	spawn.MouseButton1Click:Connect(MarcarSpawn)
-
-	local voltar = Instance.new("TextButton")
-	voltar.Size = UDim2.new(1, -20, 0, 35)
-	voltar.Position = UDim2.new(0, 10, 0, 285)
-	voltar.BackgroundColor3 = Color3.fromRGB(42, 42, 47)
-	voltar.BorderSizePixel = 0
-	voltar.Text = "VOLTAR AO SPAWN"
-	voltar.TextColor3 = Color3.fromRGB(255, 255, 255)
-	voltar.Font = Enum.Font.GothamBold
-	voltar.TextSize = 12
-	voltar.Parent = Conteudo
-
-	local voltarCanto = Instance.new("UICorner")
-	voltarCanto.CornerRadius = UDim.new(0, 5)
-	voltarCanto.Parent = voltar
-
-	voltar.MouseButton1Click:Connect(VoltarSpawn)
-
-	local fome = Instance.new("TextButton")
-	fome.Size = UDim2.new(0, 130, 0, 30)
-	fome.Position = UDim2.new(1, -140, 0, 10)
-	fome.BackgroundColor3 = Color3.fromRGB(42, 42, 47)
-	fome.BorderSizePixel = 0
-	fome.Text = "FOME 100"
-	fome.TextColor3 = Color3.fromRGB(255, 255, 255)
-	fome.Font = Enum.Font.GothamBold
-	fome.TextSize = 11
-	fome.Parent = Conteudo
-
-	local fomeCanto = Instance.new("UICorner")
-	fomeCanto.CornerRadius = UDim.new(0, 5)
-	fomeCanto.Parent = fome
-
-	fome.MouseButton1Click:Connect(PreencherFome)
-
-	local sede = Instance.new("TextButton")
-	sede.Size = UDim2.new(0, 130, 0, 30)
-	sede.Position = UDim2.new(1, -140, 0, 45)
-	sede.BackgroundColor3 = Color3.fromRGB(42, 42, 47)
-	sede.BorderSizePixel = 0
-	sede.Text = "SEDE 100"
-	sede.TextColor3 = Color3.fromRGB(255, 255, 255)
-	sede.Font = Enum.Font.GothamBold
-	sede.TextSize = 11
-	sede.Parent = Conteudo
-
-	local sedeCanto = Instance.new("UICorner")
-	sedeCanto.CornerRadius = UDim.new(0, 5)
-	sedeCanto.Parent = sede
-
-	sede.MouseButton1Click:Connect(PreencherSede)
+		LocalPlayer.Character:SetAttribute("Sede",100)
+	end
 end
 
+BotaoSede.MouseButton1Click:Connect(function()
+
+	EncherSede()
+
+	BotaoSede.Text = "✓  Sede Completa!"
+
+	task.delay(1.5,function()
+
+		if BotaoSede.Parent then
+			BotaoSede.Text =
+				"Encher Barra de Sede"
+		end
+	end)
+end)
+
 --========================================================
--- NAVEGAÇÃO
+-- RESPAWN
 --========================================================
 
-BotaoHome.MouseButton1Click:Connect(AbrirHome)
+LocalPlayer.CharacterAdded:Connect(function(character)
 
-BotaoTP.MouseButton1Click:Connect(AbrirTP)
+	task.wait(0.2)
 
-BotaoTools.MouseButton1Click:Connect(AbrirTools)
+	if VIDA_INFINITA then
+		AtivarVida(character)
+	end
 
-BotaoConfig.MouseButton1Click:Connect(AbrirConfig)
+	if spawnMarcado then
+
+		local root =
+			character:WaitForChild(
+				"HumanoidRootPart",
+				10
+			)
+
+		if root then
+
+			task.wait(0.2)
+
+			root.CFrame =
+				spawnMarcado *
+				CFrame.new(0,3,0)
+		end
+	end
+end)
+
+--========================================================
+-- TROCA DE TELAS
+--========================================================
+
+local function AbrirHome()
+
+	Home.Visible = true
+	TelaTP.Visible = false
+	TelaTools.Visible = false
+
+	Titulo.Text = "JF PAINEL"
+
+	Home.CanvasPosition =
+		Vector2.new(0,0)
+end
+
+local function AbrirTP()
+
+	Home.Visible = false
+	TelaTP.Visible = true
+	TelaTools.Visible = false
+
+	Titulo.Text =
+		"JF PAINEL • TP PLAYER"
+
+	AtualizarPlayers()
+end
+
+BotaoHome.MouseButton1Click:Connect(function()
+	AbrirHome()
+end)
+
+BotaoTP.MouseButton1Click:Connect(function()
+	AbrirTP()
+end)
+
+BotaoTools.MouseButton1Click:Connect(function()
+	Home.Visible = false
+	TelaTP.Visible = false
+	TelaTools.Visible = true
+
+	Titulo.Text = "JF PAINEL • TOOLS"
+	CarregarTools()
+end)
+
+BotaoConfig.MouseButton1Click:Connect(function()
+
+	AbrirHome()
+
+	task.defer(function()
+
+		Home.CanvasPosition =
+			Vector2.new(0,600)
+	end)
+end)
 
 --========================================================
 -- MINIMIZAR
 --========================================================
 
-local painelMinimizado = false
+local minimizado = false
 
 Minimizar.MouseButton1Click:Connect(function()
-	painelMinimizado = not painelMinimizado
 
-	Menu.Visible = not painelMinimizado
-	Conteudo.Visible = not painelMinimizado
+	minimizado =
+		not minimizado
 
-	if painelMinimizado then
-		Painel.Size = UDim2.new(0, 300, 0, 45)
+	Menu.Visible =
+		not minimizado
+
+	Home.Visible =
+		not minimizado
+
+	TelaTP.Visible = false
+
+	if minimizado then
+
+		Painel.Size =
+			UDim2.fromOffset(
+				larguraPainel,
+				45
+			)
+
+		Minimizar.Text = "+"
+
 	else
-		Painel.Size = UDim2.new(0, 500, 0, 350)
+
+		Painel.Size =
+			UDim2.fromOffset(
+				larguraPainel,
+				alturaPainel
+			)
+
+		Minimizar.Text = "—"
+
+		AbrirHome()
 	end
 end)
 
@@ -1568,161 +2155,202 @@ end)
 --========================================================
 
 Fechar.MouseButton1Click:Connect(function()
-	ScreenGui.Enabled = false
-end)
 
---========================================================
--- PERSONAGEM
---========================================================
-
-Player.CharacterAdded:Connect(function(character)
-
-	task.wait(1)
-
-	if VIDA_INFINITA then
-		AtivarVidaInfinita()
+	if marcadorSpawn then
+		marcadorSpawn:Destroy()
 	end
 
-	if spawnMarcado then
-		local root = character:FindFirstChild("HumanoidRootPart")
+	if conexaoVida then
+		conexaoVida:Disconnect()
+	end
 
-		if root then
-			root.CFrame = spawnMarcado
+	for _,caixa in pairs(ESPs) do
+
+		if caixa then
+			caixa:Destroy()
 		end
 	end
-end)
 
---========================================================
--- PLAYER ADICIONADO
---========================================================
+	for _,dadosVida in pairs(BarrasVida) do
 
-Players.PlayerAdded:Connect(function()
-	task.wait(0.5)
-
-	if ListaPlayers then
-		AtualizarPlayers()
-	end
-end)
-
-Players.PlayerRemoving:Connect(function()
-	task.wait(0.5)
-
-	if ListaPlayers then
-		AtualizarPlayers()
-	end
-end)
-
---========================================================
--- DETECTAR TOOLS NOVAS
---========================================================
-
-workspace.DescendantAdded:Connect(function(obj)
-	if obj:IsA("Tool") then
-		task.wait()
-
-		if ListaTools then
-			CarregarTools()
+		if dadosVida and dadosVida.Fundo then
+			dadosVida.Fundo:Destroy()
 		end
 	end
+
+	Interface:Destroy()
 end)
-
-ReplicatedStorage.DescendantAdded:Connect(function(obj)
-	if obj:IsA("Tool") then
-		task.wait()
-
-		if ListaTools then
-			CarregarTools()
-		end
-	end
-end)
-
-if Player.Backpack then
-	Player.Backpack.ChildAdded:Connect(function(obj)
-		if obj:IsA("Tool") then
-			if ListaTools then
-				task.wait()
-				CarregarTools()
-			end
-		end
-	end)
-end
 
 --========================================================
--- RENDER
+-- ATUALIZAÇÃO
 --========================================================
 
 RunService.RenderStepped:Connect(function()
 
 	-- FOV
-	FOVCircle.Visible = FOV_ATIVADO
-	FOVCircle.Size = UDim2.new(
-		0,
-		TAMANHO_FOV * 2,
-		0,
-		TAMANHO_FOV * 2
-	)
 
-	-- VIDA INFINITA
+	CirculoFOV.Visible =
+		FOV_ATIVADO
+
+	CirculoFOV.Size =
+		UDim2.fromOffset(
+			TAMANHO_FOV*2,
+			TAMANHO_FOV*2
+		)
+
+	-- VIDA
+
 	if VIDA_INFINITA then
-		local character = Player.Character
 
-		if character then
-			local humanoid = character:FindFirstChildOfClass("Humanoid")
+		local char = LocalPlayer.Character
 
-			if humanoid then
-				if humanoid.Health < humanoid.MaxHealth then
-					humanoid.Health = humanoid.MaxHealth
-				end
+		if char == personagemProtegido then
+
+			local humanoid =
+				char:FindFirstChildOfClass("Humanoid")
+
+			if humanoid
+				and humanoid.Parent
+				and humanoid.Health < humanoid.MaxHealth then
+
+				humanoid.Health =
+					humanoid.MaxHealth
 			end
 		end
 	end
 
 	-- ESP
-	AtualizarESP()
 
-	-- BARRA DE VIDA
-	AtualizarBarraVida()
+	for _,player in ipairs(Players:GetPlayers()) do
 
-	-- MIRA ASSISTIDA
-	if MIRA_ATIVADA and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then
+		if player ~= LocalPlayer then
 
-		local alvo = PegarAlvo()
+			local caixa =
+				CriarESP(player)
+
+			local dadosVida = BarrasVida[player]
+
+			local char =
+				player.Character
+
+			if char then
+
+				local humanoid =
+					char:FindFirstChildOfClass("Humanoid")
+
+				if humanoid
+					and humanoid.Health > 0 then
+
+					local minX,maxX,minY,maxY =
+						Limites(char)
+
+					if minX then
+
+						if ESP_ATIVADO then
+							caixa.Visible = true
+
+							caixa.Position =
+								UDim2.fromOffset(
+									minX,
+									minY
+								)
+
+							caixa.Size =
+								UDim2.fromOffset(
+									maxX-minX,
+									maxY-minY
+								)
+						else
+							caixa.Visible = false
+						end
+
+						if dadosVida then
+							local altura = math.max(18, maxY-minY)
+							local percentual = 0
+
+							if humanoid.MaxHealth > 0 then
+								percentual = math.clamp(humanoid.Health / humanoid.MaxHealth,0,1)
+							end
+
+							dadosVida.Fundo.Visible = BARRA_VIDA_ATIVADA
+							dadosVida.Fundo.Position = UDim2.fromOffset(math.max(2,minX-7),minY)
+							dadosVida.Fundo.Size = UDim2.fromOffset(4,altura)
+							dadosVida.Preenchimento.Size = UDim2.new(1,0,percentual,0)
+						end
+
+					else
+
+						caixa.Visible = false
+
+						if dadosVida then
+							dadosVida.Fundo.Visible = false
+						end
+					end
+
+				else
+
+					caixa.Visible = false
+
+					if dadosVida then
+						dadosVida.Fundo.Visible = false
+					end
+				end
+
+			else
+
+				caixa.Visible = false
+
+				if dadosVida then
+					dadosVida.Fundo.Visible = false
+				end
+			end
+		end
+	end
+
+	-- MIRA
+
+	if MIRA_ATIVADA
+		and FOV_ATIVADO then
+
+		local alvo =
+			PegarAlvo()
 
 		if alvo then
-			local direcao = alvo.Position - Camera.CFrame.Position
 
-			if direcao.Magnitude > 0 then
-				local novaCFrame = CFrame.lookAt(
+			local destino =
+				CFrame.lookAt(
 					Camera.CFrame.Position,
 					alvo.Position
 				)
 
-				Camera.CFrame = Camera.CFrame:Lerp(
-					novaCFrame,
+			Camera.CFrame =
+				Camera.CFrame:Lerp(
+					destino,
 					SUAVIDADE_MIRA
 				)
-			end
 		end
 	end
 end)
 
 --========================================================
--- ABRIR PAINEL
--- INSERT = MOSTRAR/ESCONDER
+-- INSERT
 --========================================================
 
-UserInputService.InputBegan:Connect(function(input, processado)
+UserInputService.InputBegan:Connect(function(input,processado)
+
 	if processado then
 		return
 	end
 
 	if input.KeyCode == Enum.KeyCode.Insert then
-		ScreenGui.Enabled = not ScreenGui.Enabled
+
+		Painel.Visible =
+			not Painel.Visible
 	end
 end)
 
 --========================================================
--- INICIALIZAÇÃO
+-- INICIAR
 --========================================================
 
 AbrirHome()
