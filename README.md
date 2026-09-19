@@ -258,7 +258,7 @@ Home.BackgroundColor3 = Color3.fromRGB(30,30,30)
 Home.BorderSizePixel = 0
 Home.ScrollBarThickness = 5
 Home.ScrollBarImageColor3 = Color3.fromRGB(150,0,0)
-Home.CanvasSize = UDim2.fromOffset(0,650)
+Home.CanvasSize = UDim2.fromOffset(0,730)
 Home.Parent = Painel
 
 local hc = Instance.new("UICorner")
@@ -1221,104 +1221,105 @@ end)
 
 
 --========================================================
--- FOME E SEDE
+-- ENCHER BARRA DE FOME
 --========================================================
-
-local function DefinirNecessidade(nome, valor)
-	local alterou = false
-
-	-- Atributos do jogador
-	if LocalPlayer:GetAttribute(nome) ~= nil then
-		LocalPlayer:SetAttribute(nome, valor)
-		alterou = true
-	end
-
-	-- Valores dentro do Player
-	for _,obj in ipairs(LocalPlayer:GetDescendants()) do
-		if obj.Name == nome and (obj:IsA("NumberValue") or obj:IsA("IntValue")) then
-			obj.Value = valor
-			alterou = true
-		end
-	end
-
-	-- Valores dentro do personagem
-	local character = LocalPlayer.Character
-	if character then
-		for _,obj in ipairs(character:GetDescendants()) do
-			if obj.Name == nome and (obj:IsA("NumberValue") or obj:IsA("IntValue")) then
-				obj.Value = valor
-				alterou = true
-			end
-		end
-	end
-
-	-- Valores dentro do PlayerGui
-	for _,obj in ipairs(PlayerGui:GetDescendants()) do
-		if obj.Name == nome and (obj:IsA("NumberValue") or obj:IsA("IntValue")) then
-			obj.Value = valor
-			alterou = true
-		end
-	end
-
-	return alterou
-end
-
-local function ResultadoNecessidade(botao, textoOriginal, nome)
-	local encontrou = DefinirNecessidade(nome, 100)
-
-	if encontrou then
-		botao.Text = "âœ“  "..textoOriginal.." Completa!"
-	else
-		botao.Text = "âš   "..nome.." nÃ£o encontrado"
-	end
-
-	task.delay(1.5,function()
-		if botao and botao.Parent then
-			botao.Text = textoOriginal
-		end
-	end)
-end
-
-local TituloNecessidades = Instance.new("TextLabel")
-TituloNecessidades.Size = UDim2.new(1,-24,0,25)
-TituloNecessidades.Position = UDim2.fromOffset(12,604)
-TituloNecessidades.BackgroundTransparency = 1
-TituloNecessidades.Text = "NECESSIDADES"
-TituloNecessidades.TextColor3 = Color3.fromRGB(160,160,160)
-TituloNecessidades.Font = Enum.Font.GothamBold
-TituloNecessidades.TextSize = 11
-TituloNecessidades.TextXAlignment = Enum.TextXAlignment.Left
-TituloNecessidades.Parent = Home
 
 local BotaoFome =
 	CriarAcao(
 		"ðŸ—  Encher Barra de Fome",
-		634
+		604
 	)
 
+local function EncherFome()
+	-- Procura um NumberValue/IntValue chamado Fome no Player
+	-- ou no Character.
+	local fome = LocalPlayer:FindFirstChild("Fome")
+
+	if not fome and LocalPlayer.Character then
+		fome = LocalPlayer.Character:FindFirstChild("Fome")
+	end
+
+	if fome and (fome:IsA("NumberValue") or fome:IsA("IntValue")) then
+		fome.Value = 100
+	end
+
+	-- TambÃ©m suporta sistemas que usam Attribute.
+	if LocalPlayer:GetAttribute("Fome") ~= nil then
+		LocalPlayer:SetAttribute("Fome",100)
+	end
+
+	if LocalPlayer.Character
+		and LocalPlayer.Character:GetAttribute("Fome") ~= nil then
+
+		LocalPlayer.Character:SetAttribute("Fome",100)
+	end
+end
+
 BotaoFome.MouseButton1Click:Connect(function()
-	ResultadoNecessidade(
-		BotaoFome,
-		"ðŸ—  Encher Barra de Fome",
-		"Fome"
-	)
+
+	EncherFome()
+
+	BotaoFome.Text = "âœ“  Fome Completa!"
+
+	task.delay(1.5,function()
+
+		if BotaoFome.Parent then
+			BotaoFome.Text =
+				"ðŸ—  Encher Barra de Fome"
+		end
+	end)
 end)
+
+
+--========================================================
+-- ENCHER BARRA DE SEDE
+--========================================================
 
 local BotaoSede =
 	CriarAcao(
 		"ðŸ’§  Encher Barra de Sede",
-		690
+		660
 	)
+
+local function EncherSede()
+	-- Procura um NumberValue/IntValue chamado Sede no Player
+	-- ou no Character.
+	local sede = LocalPlayer:FindFirstChild("Sede")
+
+	if not sede and LocalPlayer.Character then
+		sede = LocalPlayer.Character:FindFirstChild("Sede")
+	end
+
+	if sede and (sede:IsA("NumberValue") or sede:IsA("IntValue")) then
+		sede.Value = 100
+	end
+
+	-- TambÃ©m suporta sistemas que usam Attribute.
+	if LocalPlayer:GetAttribute("Sede") ~= nil then
+		LocalPlayer:SetAttribute("Sede",100)
+	end
+
+	if LocalPlayer.Character
+		and LocalPlayer.Character:GetAttribute("Sede") ~= nil then
+
+		LocalPlayer.Character:SetAttribute("Sede",100)
+	end
+end
 
 BotaoSede.MouseButton1Click:Connect(function()
-	ResultadoNecessidade(
-		BotaoSede,
-		"ðŸ’§  Encher Barra de Sede",
-		"Sede"
-	)
-end)
 
-Home.CanvasSize = UDim2.fromOffset(0,755)
+	EncherSede()
+
+	BotaoSede.Text = "âœ“  Sede Completa!"
+
+	task.delay(1.5,function()
+
+		if BotaoSede.Parent then
+			BotaoSede.Text =
+				"ðŸ’§  Encher Barra de Sede"
+		end
+	end)
+end)
 
 --========================================================
 -- RESPAWN
