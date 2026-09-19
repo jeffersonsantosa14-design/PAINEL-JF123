@@ -626,7 +626,7 @@ local InfoTools = Instance.new("TextLabel")
 InfoTools.Size = UDim2.new(1,-24,0,25)
 InfoTools.Position = UDim2.fromOffset(12,42)
 InfoTools.BackgroundTransparency = 1
-InfoTools.Text = "Tools visíveis no mapa e armazenadas nos serviços replicados"
+InfoTools.Text = "Procurando Tools em todo o conteúdo replicado para o cliente"
 InfoTools.TextColor3 = Color3.fromRGB(145,145,145)
 InfoTools.Font = Enum.Font.Gotham
 InfoTools.TextSize = 10
@@ -677,83 +677,71 @@ local atc = Instance.new("UICorner")
 atc.CornerRadius = UDim.new(0,5)
 atc.Parent = AtualizarTools
 
--- Guarda o caminho físico de cada Tool encontrada.
+-- Guarda todas as Tools que o cliente conseguiu enxergar.
+-- IMPORTANTE: LocalScript NÃO consegue enxergar ServerStorage/ServerScriptService.
 local ToolsEncontradas = {}
 
-local function LerLocalizacao(tool)
-	local parent = tool.Parent
-	if parent == workspace or tool:IsDescendantOf(workspace) then
-		return "Workspace"
+local function CaminhoSeguro(obj)
+	local ok, caminho = pcall(function()
+		return obj:GetFullName()
+	end)
+
+	if ok then
+		return caminho
 	end
 
-	if tool:IsDescendantOf(ReplicatedStorage) then
+	return obj.Name
+end
+
+local function DescobrirOrigem(tool)
+	local caminho = CaminhoSeguro(tool)
+
+	if tool:IsDescendantOf(workspace) then
+		return "Mapa / Workspace"
+	elseif tool:IsDescendantOf(ReplicatedStorage) then
 		return "ReplicatedStorage"
-	end
-
-	local starterPack = game:GetService("StarterPack")
-	if tool:IsDescendantOf(starterPack) then
+	elseif tool:IsDescendantOf(game:GetService("StarterPack")) then
 		return "StarterPack"
+	elseif LocalPlayer.Character and tool:IsDescendantOf(LocalPlayer.Character) then
+		return "Seu personagem"
+	elseif LocalPlayer:FindFirstChildOfClass("Backpack") and tool:IsDescendantOf(LocalPlayer:FindFirstChildOfClass("Backpack")) then
+		return "Seu Backpack"
 	end
 
-	return parent and parent:GetFullName() or "Desconhecido"
+	return caminho
 end
 
 local function ColetarTools()
 	local resultado = {}
-	local usados = {}
+	local encontrados = {}
 
-	-- Workspace = Tools espalhadas pelo mapa.
-	for _,obj in ipairs(workspace:GetDescendants()) do
+	-- O cliente só recebe objetos que foram replicados para ele.
+	-- game:GetDescendants() procura em TUDO que estiver visível para o cliente.
+	for _, obj in ipairs(game:GetDescendants()) do
 		if obj:IsA("Tool") and obj.Archivable then
-			local chave = obj:GetFullName()
-			if not usados[chave] then
-				usados[chave] = true
+			local caminho = CaminhoSeguro(obj)
+
+			if not encontrados[caminho] then
+				encontrados[caminho] = true
+
 				table.insert(resultado, {
 					Name = obj.Name,
-					Location = "Workspace",
+					Location = DescobrirOrigem(obj),
+					Path = caminho,
 					Instance = obj,
 				})
 			end
 		end
 	end
 
-	-- ReplicatedStorage = Tools replicadas para o cliente.
-	for _,obj in ipairs(ReplicatedStorage:GetDescendants()) do
-		if obj:IsA("Tool") and obj.Archivable then
-			local chave = obj:GetFullName()
-			if not usados[chave] then
-				usados[chave] = true
-				table.insert(resultado, {
-					Name = obj.Name,
-					Location = "ReplicatedStorage",
-					Instance = obj,
-				})
-			end
-		end
-	end
-
-	-- StarterPack = Tools que o jogo entrega normalmente ao spawnar.
-	local starterPack = game:GetService("StarterPack")
-	for _,obj in ipairs(starterPack:GetDescendants()) do
-		if obj:IsA("Tool") and obj.Archivable then
-			local chave = obj:GetFullName()
-			if not usados[chave] then
-				usados[chave] = true
-				table.insert(resultado, {
-					Name = obj.Name,
-					Location = "StarterPack",
-					Instance = obj,
-				})
-			end
-		end
-	end
-
-	table.sort(resultado,function(a,b)
+	table.sort(resultado, function(a,b)
 		local an = string.lower(a.Name)
 		local bn = string.lower(b.Name)
+
 		if an == bn then
-			return a.Location < b.Location
+			return string.lower(a.Path) < string.lower(b.Path)
 		end
+
 		return an < bn
 	end)
 
@@ -768,65 +756,94 @@ local function LimparListaTools()
 	end
 end
 
-local function ColocarNoInventario(info,botao)
+local function ResetarBotao(pegar)
+	if not pegar or not pegar.Parent then
+		return
+	end
+
+	pegar.Text = "PEGAR"
+	pegar.BackgroundColor3 = Color3.fromRGB(150,0,0)
+end
+
+local function JaPossuiTool(nome)
+	local backpack = LocalPlayer:FindFirstChildOfClass("Backpack")
+
+	if backpack then
+		for _,obj in ipairs(backpack:GetChildren()) do
+			if obj:IsA("Tool") and obj.Name == nome then
+				return true
+			end
+		end
+	end
+
+	local character = LocalPlayer.Character
+	if character then
+		for _,obj in ipairs(character:GetChildren()) do
+			if obj:IsA("Tool") and obj.Name == nome then
+				return true
+			end
+		end
+	end
+
+	return false
+end
+
+local function ColocarNoInventario(info, botao)
 	local tool = info.Instance
+
 	if not tool or not tool.Parent then
-		botao.Text = "NÃO ENCONTRADA"
+		botao.Text = "TOOL SUMIU"
+		task.delay(1.5, function()
+			ResetarBotao(botao)
+		end)
 		return false
 	end
 
 	local backpack = LocalPlayer:FindFirstChildOfClass("Backpack")
 	if not backpack then
 		botao.Text = "BACKPACK NÃO ACHADA"
-		return false
-	end
-
-	local jaTem = false
-	for _,obj in ipairs(backpack:GetChildren()) do
-		if obj:IsA("Tool") and obj.Name == tool.Name then
-			jaTem = true
-			break
-		end
-	end
-
-	if LocalPlayer.Character then
-		for _,obj in ipairs(LocalPlayer.Character:GetChildren()) do
-			if obj:IsA("Tool") and obj.Name == tool.Name then
-				jaTem = true
-				break
-			end
-		end
-	end
-
-	if jaTem then
-		botao.Text = "JÁ POSSUI"
-		task.delay(1.2,function()
-			if botao.Parent then
-				botao.Text = "PEGAR"
-			end
+		task.delay(1.5, function()
+			ResetarBotao(botao)
 		end)
 		return false
 	end
 
+	if JaPossuiTool(tool.Name) then
+		botao.Text = "JÁ POSSUI"
+		task.delay(1.2, function()
+			ResetarBotao(botao)
+		end)
+		return false
+	end
+
+	-- Faz uma cópia completa da Tool que o cliente consegue enxergar.
 	local clone
-	local ok = pcall(function()
+	local ok, err = pcall(function()
 		clone = tool:Clone()
 	end)
 
 	if not ok or not clone then
 		botao.Text = "NÃO PODE COPIAR"
+		task.delay(1.5, function()
+			ResetarBotao(botao)
+		end)
 		return false
 	end
 
 	clone.Parent = backpack
-	botao.Text = "ADQUIRIDA"
-	botao.BackgroundColor3 = Color3.fromRGB(30,120,55)
 
-	task.delay(1.5,function()
-		if botao.Parent then
-			botao.Text = "PEGAR"
-			botao.BackgroundColor3 = Color3.fromRGB(150,0,0)
+	-- Confirma visualmente que chegou ao Backpack local.
+	task.defer(function()
+		if clone.Parent == backpack then
+			botao.Text = "NO INVENTÁRIO"
+			botao.BackgroundColor3 = Color3.fromRGB(30,120,55)
+		else
+			botao.Text = "FALHOU"
 		end
+	end)
+
+	task.delay(1.8, function()
+		ResetarBotao(botao)
 	end)
 
 	return true
@@ -838,12 +855,13 @@ local function MostrarTools(lista)
 
 	if not lista or #lista == 0 then
 		local vazio = Instance.new("TextLabel")
-		vazio.Size = UDim2.new(1,-8,0,60)
+		vazio.Size = UDim2.new(1,-8,0,75)
 		vazio.BackgroundTransparency = 1
-		vazio.Text = "Nenhuma Tool encontrada nos locais visíveis."
+		vazio.Text = "Nenhuma Tool foi encontrada no conteúdo replicado para este jogador."
 		vazio.TextColor3 = Color3.fromRGB(150,150,150)
 		vazio.Font = Enum.Font.Gotham
 		vazio.TextSize = 12
+		vazio.TextWrapped = true
 		vazio.Parent = ListaTools
 		return
 	end
@@ -851,7 +869,7 @@ local function MostrarTools(lista)
 	for indice,info in ipairs(lista) do
 		local item = Instance.new("Frame")
 		item.Name = "Tool_" .. indice
-		item.Size = UDim2.new(1,-8,0,56)
+		item.Size = UDim2.new(1,-8,0,64)
 		item.BackgroundColor3 = Color3.fromRGB(42,42,42)
 		item.BorderSizePixel = 0
 		item.Parent = ListaTools
@@ -861,7 +879,7 @@ local function MostrarTools(lista)
 		ic.Parent = item
 
 		local nome = Instance.new("TextLabel")
-		nome.Size = UDim2.new(1,-130,0,25)
+		nome.Size = UDim2.new(1,-140,0,25)
 		nome.Position = UDim2.fromOffset(10,5)
 		nome.BackgroundTransparency = 1
 		nome.Text = info.Name
@@ -873,13 +891,13 @@ local function MostrarTools(lista)
 		nome.Parent = item
 
 		local localizacao = Instance.new("TextLabel")
-		localizacao.Size = UDim2.new(1,-130,0,20)
-		localizacao.Position = UDim2.fromOffset(10,30)
+		localizacao.Size = UDim2.new(1,-140,0,30)
+		localizacao.Position = UDim2.fromOffset(10,29)
 		localizacao.BackgroundTransparency = 1
 		localizacao.Text = info.Location
 		localizacao.TextColor3 = Color3.fromRGB(145,145,145)
 		localizacao.Font = Enum.Font.Gotham
-		localizacao.TextSize = 10
+		localizacao.TextSize = 9
 		localizacao.TextXAlignment = Enum.TextXAlignment.Left
 		localizacao.TextTruncate = Enum.TextTruncate.AtEnd
 		localizacao.Parent = item
@@ -901,25 +919,39 @@ local function MostrarTools(lista)
 
 		pegar.MouseButton1Click:Connect(function()
 			pegar.Text = "PEGANDO..."
-			ColocarNoInventario(info,pegar)
+			ColocarNoInventario(info, pegar)
 		end)
 	end
 end
 
 local function CarregarTools()
-	AtualizarTools.Text = "Procurando..."
+	AtualizarTools.Text = "PROCURANDO..."
 
-	local ok,lista = pcall(ColetarTools)
+	local ok, lista = pcall(ColetarTools)
+
 	if ok then
 		MostrarTools(lista)
+		InfoTools.Text = tostring(#lista) .. " Tool(s) encontrada(s) no conteúdo visível ao cliente"
 	else
 		MostrarTools(nil)
+		InfoTools.Text = "Não foi possível fazer a busca"
 	end
 
-	AtualizarTools.Text = "Atualizar"
+	AtualizarTools.Text = "ATUALIZAR"
 end
 
 AtualizarTools.MouseButton1Click:Connect(CarregarTools)
+
+-- Atualiza automaticamente quando novas Tools chegam ao cliente.
+game.DescendantAdded:Connect(function(obj)
+	if obj:IsA("Tool") and TelaTools.Visible then
+		task.delay(0.15, function()
+			if TelaTools.Visible then
+				CarregarTools()
+			end
+		end)
+	end
+end)
 
 --========================================================
 -- MIRA
