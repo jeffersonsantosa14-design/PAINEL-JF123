@@ -19,6 +19,7 @@ local Camera = workspace.CurrentCamera
 
 local ESP_ATIVADO = false
 local FOV_ATIVADO = false
+local BARRA_VIDA_ATIVADA = false
 local MIRA_ATIVADA = false
 local VIDA_INFINITA = false
 
@@ -591,6 +592,24 @@ BotaoFOV.MouseButton1Click:Connect(function()
 		ToggleFOV,
 		BolaFOV,
 		FOV_ATIVADO
+	)
+end)
+
+--========================================================
+-- BARRA DE VIDA
+--========================================================
+
+local BotaoBarraVida,ToggleBarraVida,BolaBarraVida =
+	CriarOpcao("Barra de Vida",162)
+
+BotaoBarraVida.MouseButton1Click:Connect(function()
+
+	BARRA_VIDA_ATIVADA = not BARRA_VIDA_ATIVADA
+
+	Alternar(
+		ToggleBarraVida,
+		BolaBarraVida,
+		BARRA_VIDA_ATIVADA
 	)
 end)
 
@@ -1473,6 +1492,7 @@ cfs.Parent = CirculoFOV
 --========================================================
 
 local ESPs = {}
+local BarrasVida = {}
 
 local function CriarESP(player)
 
@@ -1492,7 +1512,37 @@ local function CriarESP(player)
 	stroke.Thickness = 2
 	stroke.Parent = caixa
 
+	local fundoVida = Instance.new("Frame")
+	fundoVida.Name = "FundoVida"
+	fundoVida.BackgroundColor3 = Color3.fromRGB(15,15,15)
+	fundoVida.BorderSizePixel = 0
+	fundoVida.Visible = false
+	fundoVida.ZIndex = 20
+	fundoVida.Parent = Interface
+
+	local cantoFundo = Instance.new("UICorner")
+	cantoFundo.CornerRadius = UDim.new(0,2)
+	cantoFundo.Parent = fundoVida
+
+	local preenchimentoVida = Instance.new("Frame")
+	preenchimentoVida.Name = "PreenchimentoVida"
+	preenchimentoVida.AnchorPoint = Vector2.new(0,1)
+	preenchimentoVida.Position = UDim2.new(0,0,1,0)
+	preenchimentoVida.Size = UDim2.new(1,0,1,0)
+	preenchimentoVida.BackgroundColor3 = Color3.fromRGB(40,220,80)
+	preenchimentoVida.BorderSizePixel = 0
+	preenchimentoVida.ZIndex = 21
+	preenchimentoVida.Parent = fundoVida
+
+	local cantoPreenchimento = Instance.new("UICorner")
+	cantoPreenchimento.CornerRadius = UDim.new(0,2)
+	cantoPreenchimento.Parent = preenchimentoVida
+
 	ESPs[player] = caixa
+	BarrasVida[player] = {
+		Fundo = fundoVida,
+		Preenchimento = preenchimentoVida,
+	}
 
 	return caixa
 end
@@ -1502,6 +1552,11 @@ Players.PlayerRemoving:Connect(function(player)
 	if ESPs[player] then
 		ESPs[player]:Destroy()
 		ESPs[player] = nil
+	end
+
+	if BarrasVida[player] then
+		BarrasVida[player].Fundo:Destroy()
+		BarrasVida[player] = nil
 	end
 end)
 
@@ -2116,6 +2171,13 @@ Fechar.MouseButton1Click:Connect(function()
 		end
 	end
 
+	for _,dadosVida in pairs(BarrasVida) do
+
+		if dadosVida and dadosVida.Fundo then
+			dadosVida.Fundo:Destroy()
+		end
+	end
+
 	Interface:Destroy()
 end)
 
@@ -2166,10 +2228,12 @@ RunService.RenderStepped:Connect(function()
 			local caixa =
 				CriarESP(player)
 
+			local dadosVida = BarrasVida[player]
+
 			local char =
 				player.Character
 
-			if ESP_ATIVADO and char then
+			if char then
 
 				local humanoid =
 					char:FindFirstChildOfClass("Humanoid")
@@ -2182,33 +2246,63 @@ RunService.RenderStepped:Connect(function()
 
 					if minX then
 
-						caixa.Visible = true
+						if ESP_ATIVADO then
+							caixa.Visible = true
 
-						caixa.Position =
-							UDim2.fromOffset(
-								minX,
-								minY
-							)
+							caixa.Position =
+								UDim2.fromOffset(
+									minX,
+									minY
+								)
 
-						caixa.Size =
-							UDim2.fromOffset(
-								maxX-minX,
-								maxY-minY
-							)
+							caixa.Size =
+								UDim2.fromOffset(
+									maxX-minX,
+									maxY-minY
+								)
+						else
+							caixa.Visible = false
+						end
+
+						if dadosVida then
+							local altura = math.max(18, maxY-minY)
+							local percentual = 0
+
+							if humanoid.MaxHealth > 0 then
+								percentual = math.clamp(humanoid.Health / humanoid.MaxHealth,0,1)
+							end
+
+							dadosVida.Fundo.Visible = BARRA_VIDA_ATIVADA
+							dadosVida.Fundo.Position = UDim2.fromOffset(math.max(2,minX-7),minY)
+							dadosVida.Fundo.Size = UDim2.fromOffset(4,altura)
+							dadosVida.Preenchimento.Size = UDim2.new(1,0,percentual,0)
+						end
 
 					else
 
 						caixa.Visible = false
+
+						if dadosVida then
+							dadosVida.Fundo.Visible = false
+						end
 					end
 
 				else
 
 					caixa.Visible = false
+
+					if dadosVida then
+						dadosVida.Fundo.Visible = false
+					end
 				end
 
 			else
 
 				caixa.Visible = false
+
+				if dadosVida then
+					dadosVida.Fundo.Visible = false
+				end
 			end
 		end
 	end
