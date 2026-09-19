@@ -663,7 +663,7 @@ CaixaBuscaTool.Position = UDim2.fromOffset(12,38)
 CaixaBuscaTool.BackgroundColor3 = Color3.fromRGB(42,42,42)
 CaixaBuscaTool.BorderSizePixel = 0
 CaixaBuscaTool.PlaceholderText = "Pesquisar Tool..."
-CaixaBuscaTool.Text = "ArmaPdsecreta"
+CaixaBuscaTool.Text = "ArmaPDSecreta"
 CaixaBuscaTool.ClearTextOnFocus = false
 CaixaBuscaTool.TextColor3 = Color3.fromRGB(235,235,235)
 CaixaBuscaTool.PlaceholderColor3 = Color3.fromRGB(120,120,120)
@@ -1126,7 +1126,7 @@ local function MostrarTools(lista)
     end)
 
     for indice,info in ipairs(lista) do
-        CriarItemTool(info, indice, PontuacaoNome(info.Name, "ArmaPdsecreta") >= 850)
+        CriarItemTool(info, indice, PontuacaoNome(info.Name, "ArmaPDSecreta") >= 850)
     end
 end
 
@@ -1138,7 +1138,7 @@ local function CarregarTools()
     if ok then
         local temAlvo = false
         for _, info in ipairs(lista) do
-            if PontuacaoNome(info.Name, "ArmaPdsecreta") >= 450 then
+            if PontuacaoNome(info.Name, "ArmaPDSecreta") >= 450 then
                 temAlvo = true
                 break
             end
@@ -1146,7 +1146,7 @@ local function CarregarTools()
 
         if not temAlvo then
             table.insert(lista, 1, {
-                Name = "ArmaPdsecreta",
+                Name = "ArmaPDSecreta",
                 Location = "Busca manual / não localizada ainda",
                 Instance = nil,
                 Path = "",
@@ -1155,7 +1155,7 @@ local function CarregarTools()
         end
 
         MostrarTools(lista)
-        InfoTools.Text = tostring(#lista) .. " entrada(s) encontrada(s); ArmaPdsecreta também fica disponível na busca manual"
+        InfoTools.Text = tostring(#lista) .. " entrada(s) encontrada(s); ArmaPDSecreta também fica disponível na busca manual"
     else
         MostrarTools({})
         InfoTools.Text = "A busca automática falhou; use a busca manual"
@@ -1168,7 +1168,7 @@ local function ProcurarPorNome()
     local alvo = CaixaBuscaTool.Text:gsub("^%s+", ""):gsub("%s+$", "")
 
     if alvo == "" then
-        alvo = "ArmaPdsecreta"
+        alvo = "ArmaPDSecreta"
         CaixaBuscaTool.Text = alvo
     end
 
@@ -1181,7 +1181,7 @@ local function ProcurarPorNome()
         InfoTools.Text = tostring(#parecidas) .. " Tool(s) encontrada(s) para: " .. alvo
 
         for indice, info in ipairs(parecidas) do
-            CriarItemTool(info, indice, PontuacaoNome(info.Name, "ArmaPdsecreta") >= 850)
+            CriarItemTool(info, indice, PontuacaoNome(info.Name, "ArmaPDSecreta") >= 850)
         end
     else
         -- Entrada manual garantida para o nome digitado.
